@@ -1,0 +1,133 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>好记好看电影网 - 新用户注册</title>
+<meta name="keywords" content="最新电视剧,电影下载,神马电影,2016最新电影,好看的电视剧,好看的电影">
+<meta name="description" content="所有影片由好记好看电影网整理,迅雷下载,百度云盘,2016最新神马电影，韩国电视剧、香港TVB电视剧、日本动漫、日剧、美剧、综艺的在线观看神马电影和剧集交流场所，神马电影在线观看高清电影，每天第一时间更新，放送好看的神马电影迅雷电影下载。">
+<link href="/Public/user/css/base.css" type="text/css" rel="stylesheet">
+<link href="/Public/user/css/qirebox.css" type="text/css" rel="stylesheet">
+<script language="javascript">
+<!-- 
+ window.onerror=function(){return true;} 
+// -->
+</script>
+<script src="/Public/user/js/jquery-1.7.1.min.js" type="text/javascript"></script>
+<script src="/Public/user/js/jquery.base.js" type="text/javascript"></script>
+<script src="/Public/user/js/formValidator-4.0.1.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="layout" id="sign-header">
+  <div id="sign-logo"><a href="/"><img src="/Public/user/images/logo.png" alt=""></a></div>
+</div>
+<!-- // sign-header end -->
+<div class="layout" id="sign-content">
+  <div class="ui-box ui-qire sign-focus" id="reg-box">
+    <div class="ui-title fn-clear">
+      <span>已有好记好看电影网帐号？请<a href="/User-Center-login">点击登录</a></span>
+      <h2>注册会员</h2>
+    </div>
+    <div class="ui-cnt fn-clear">
+        <form id="regform" action="/User-Center-reg" method="post">
+      	<input type="hidden" name="t" id="t"/>
+         <div class="ui-form" id="sign-primary">
+          <div class="ui-form-item fn-clear">
+            <label class="ui-label w100">&nbsp;</label>
+             <p class="maopou-notice">友情提示：必须使用真实邮箱注册，注册后需要激活才能成为好记好看电影网会员，后您的Email和用户名都可以登录本站！</p>
+          </div>
+          <div class="ui-form-item fn-clear">
+            <label for="email" class="ui-label w100"><strong>Email</strong>地址：</label>
+            <input type="text" id="email" name="email" class="ui-input w220" value="">
+            <p class="onError ui-message" id="emailTip" style="">你输入的邮箱长度非法,请确认</p>
+          </div>
+          <div class="ui-form-item fn-clear">
+            <label for="username" class="ui-label w100">用户名：</label>
+            <input type="text" id="username" name="username" class="ui-input w220" value="">
+            <p class="onError ui-message" id="usernameTip" style="">该用户名不可用，请更换用户名</p>
+          </div>
+          <div class="ui-form-item fn-clear">
+            <label for="password" class="ui-label w100">设置密码：</label>
+            <input type="password" id="password" name="password" maxlength="20" class="ui-input w220" value="">
+            <p class="onCorrect ui-message" id="passwordTip" style="">密码输入正确</p>
+          </div>
+          <div class="ui-form-item fn-clear">
+            <label for="verifypass" class="ui-label w100">重复密码：</label>
+            <input type="password" id="verifypass" name="verifypass" maxlength="20" class="ui-input w220" value="">
+            <p class="onShow ui-message" id="verifypassTip" style="">输再次输入密码</p>
+          </div>
+          <div class="ui-form-item fn-clear" id="validate-code">
+            <label for="validate" class="ui-label w100">验证码：</label>
+            <div class="ui-form-block w120">
+              <input type="text" id="validate" name="validate" maxlength="10" class="ui-input w110" value="">
+              <p class="validate-code-btn">看不清? <a href="javascript:void()" id="verimgbut">换一张</a></p>
+            </div>
+            <img src="/User-Checkcode" id="verimg" alt="点击图片更换验证码" title="点击图片更换验证码">
+            <p class="onShow ui-message" id="validateTip" style="">输入上图字母</p>
+          </div>
+          <div class="ui-form-item ui-form-checkbox fn-clear">
+            <label class="ui-label w100">&nbsp;</label>
+            <div class="ui-form-block w220">
+              <label for="agreement" class="ui-label-checkbox">
+                <input type="checkbox" value="" name="agreement" id="agreement" >
+                我已阅读并接受《<a href="/User-Center-agreement" target="_blank">使用协议</a>》 </label>
+            </div>
+             <p class="onShow ui-message" id="agreementTip" style="">输再次输入密码</p>
+          </div>
+          <div class="ui-form-item fn-clear">
+            <label class="ui-label w100">&nbsp;</label>
+            <input type="hidden" name="dosubmit"/>
+            <input type="submit" id="register" class="ui-button w220" value="注册会员">
+          </div>
+        </div>
+        <!-- // ui-form#sign-primary end -->
+      <input type="hidden" name="__hash__" value="7c9e5fbc22ecd7c1643fbcb9ba175eb9" /></form>
+      <div id="sign-app">
+      	<div class="sign-app-list">
+      		<h5>你还可以用以下方式直接登录：</h5>
+      		<ul class="item login-list clear blue"> 
+	            	      			<li style="margin-right:14px;">
+						<a href="/User-Center-qqlogin" target="_blank" style="background-image:url(/Public/user/images/qq_16_16.png)">腾讯QQ登录</a>
+					</li>
+	 				 				 			    
+			</ul>
+      	</div>
+      </div>
+    </div>
+  </div>
+  <!-- // sign-box#regbox end -->
+  </div>
+<!-- // sign-content end -->
+<!-- // footer end -->
+<script language="javascript" src="/Public/user/js/regvaild.js" type="text/javascript"></script>
+<script language="javascript" src="/Public/user/js/qireobj.js" type="text/javascript"></script>
+<script type="text/javascript" src="/Public/user/js/focus.js"></script>
+﻿<div class="footer">
+  <div class="layout">
+     <div class="foot-nav"><a class="color" href="/faq/" target="_blank" title="使用帮助">常见问题</a>-<a href="//new.html" target="_blank" title="最新更新">最新更新</a>-<a href="//sitemap.html" target="_blank" title="网站地图">网站地图</a>-<script src="https://s11.cnzz.com/z_stat.php?id=1258209498&web_id=1258209498" language="JavaScript"></script></div>
+    <!-- // foot-nav End -->
+    <div class="copyright">
+<div class="copyright">
+<p>
+本网站提供的最新电视剧和电影资源均系收集于各大视频网站，本网站只提供web页面服务，并不提供影片资源存储，也不参与录制、上传
+</p>
+<p>
+若本站收录的节目无意侵犯了贵司版权，请给网页底部邮箱地址来信，我们会及时处理和回复，谢谢！
+</p>
+<p>
+Copyright &copy; 2007-2016<a class="color" href="http://www.haojihaokan.com/">好记好看电影网</a> 
+<a class="color" href="http://www.haojihaokan.com/">www.haojihaokan.com </a> 
+<a class="color" href="http://www.haojihaokan.com/sitemap.html">网站地图</a>
+<a class="color" href="http://www.haojihaokan.com/sitemap.xml">sitemap</a>
+</p>
+		</div>    </div>
+    <!-- // copyright End -->
+    <!-- // maxBox End -->
+  </div>
+</div>
+<!-- // footer end -->
+<script language="javascript" src="Public/user/js/qireobj.js" type="text/javascript"></script>
+<script type="text/javascript" src="Public/user/js/jquery.colorbox.js"></script>
+<script type="text/javascript" src="Public/user/js/jquery.vod.js"></script>
+</body>
+</html>

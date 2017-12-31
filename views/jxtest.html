@@ -1,0 +1,76 @@
+
+<!doctype html>
+<html ng-app="App">
+<head>
+<meta charset="utf-8">
+<title>mov.wememe.cn 微咪咪视频解析</title>
+<style>
+html,body,div{margin:0;padding:0;width:100%;height:100%;background:#000;color:#999}
+</style>
+
+<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+
+
+<?if ne .ckpath "" ?>
+<script src="<?.ckpath?>/ckplayer.js?v=<?.time?>"></script>
+<?else?>
+<script type="text/javascript" src="/static/js/ckplayer/ckplayer.js?v=<?.time?>" charset="utf-8"></script>
+<?end?>
+
+<script>
+
+<?if ne .ckpath "" ?>
+	var m3 = "<?.ckpath?>/m3u8.swf?v=<?.time?>"; 
+	var player = "<?.ckpath?>"+"/ckplayer.swf?v=<?.time?>";
+<?else?>
+	var m3 = "/static/js/ckplayer/m3u8.swf?v=<?.time?>"; 
+	var player = "<?.web?>/static/js/ckplayer/ckplayer.swf?v=<?.time?>";
+<?end?>
+
+	var platform = "<?.platform?>";
+
+	var data = "<?.data?>";
+
+	var flashvars={};
+
+	var video = [];
+
+	var params={bgcolor:'#FFF',allowFullScreen:true,allowScriptAccess:'always',wmode:'transparent'};
+	
+	var api = "/api2/" + platform + "/?data=" + encodeURIComponent(data) ;
+
+	alert(api);
+
+</script>
+
+</head>
+<body>
+
+  <div id="a1" style="height:480px"></div>
+
+		<script type="text/javascript">
+			
+	  		flashvars={
+	            f: '/static/js/ckplayer/m3u8.swf', //使用swf向播放器发送视频地址进行播放
+	            a: api,   
+	            c: 0,      			//调用 ckplayer.js 配置播放器
+	            p: 1,      			//自动播放视频
+	            s: 4,      			//flash插件形式发送视频流地址给播放器进行播放
+	            e: 0,      			//
+				lv:0,				//直播为1.其余都是0,
+				loaded: 'loadedHandler' 
+	        };
+
+			var params={bgcolor:'#FFF',allowFullScreen:true,allowScriptAccess:'always',wmode:'transparent'};
+	       	
+			var video = [api+"->video/m3u8"];
+
+            CKobject.embed('/static/js/ckplayer/ckplayer.swf', 'a1', 'ckplayer_a1', '100%', '100%', false, flashvars, video);
+
+	
+		</script>
+
+
+</body>
+</html>
+

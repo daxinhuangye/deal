@@ -1,0 +1,171 @@
+<div id="content" class="layout">
+  <div class="ui-sponsor">
+<script type="text/javascript" src="/Runtime/js/list_960_01.js" charset="utf-8"></script>  </div>
+  <div class="bread-crumb-nav fn-clear">
+    <ul class="bread-crumbs">
+      <li class="home"><a href="/">首页</a></li>
+	  <li><a href="<?.type?>"><?.cate?></a></li>
+    </ul>
+  </div>
+  <div class="ui-box filter-focus">
+    <div class="ui-title">
+      <h3>索引</h3>
+      <span><a href="/<?.type?>" target="_self"  class="conreset">重置条件</a></span>
+      <p class="conbread"></p>
+    </div>
+    <div class="ui-cnt">
+
+		<?range $k, $v := .filter.filter?>
+
+			<div class="filter-list fn-clear">
+	 			<h5><?$v.title?></h5>
+				<ul>
+					<?range $_k, $_v := $v.items?>
+	            			<?if ne $_v.title "优酷出品"?>
+								<li>
+									<a id="<?$v.cat?>_<?$_v.value?>" class="" onclick="jump('<?$v.cat?>', '<?$_v.value?>');">
+										<?if eq $_v.title "全部付费"?>全部<?else?><?$_v.title?><?end?>
+									</a>
+								</li>
+							<?end?>
+					<?end?>
+				</ul>
+			</div>
+
+		<?end?> 
+
+      
+      
+    </div>
+  </div>
+  <div class="ui-box ui-qire fn-clear" id="list-focus">
+    <div class="qire-box">
+      <div class="ui-bar fn-clear">
+        <ul class="view-mode">
+          <li id="view-grid"><a href="javascript:void(0)" class="current">海报模式</a></li>            
+        </ul>
+        <div class="view-filter">
+			<?range $k, $v := .filter.sort?>
+           			<a id="ob_<?$v.value?>" onclick="jump('', '', '<?$v.value?>');" class='' target='_self'><span><?$v.title?></span></a><em>|</em>
+			<?end?>
+		</div>
+       
+      </div>
+	<?if eq .type "game" "gaoxiao"?>
+	 	<ul class="grid-mode2 show-list fn-clear" id="contents">
+			<?range $k, $v := .list?>
+	        <li>
+				<a class="play-img2" target="_blank" href="/<?if eq $v.type "2"?>view<?else?>play<?end?>/<?$v.tid?>">
+					<img class="lazy" onerror="javascript:this.src='/static/images/empty.gif';" src="/static/images/empty.gif" data-original="<?$v.img?>" alt="<?$v.title?>" />
+		            <label class="mask"></label>
+				</a>
+	            <h5><a target="_blank" href="/<?if eq $v.type "2"?>view<?else?>play<?end?>/<?$v.tid?>"><?$v.title?></a></h5>
+	            <p class="star">播放：<?$v.subtitle?></p>
+	        </li>
+	  		<?end?>
+	      </ul>
+
+	<?else?>
+
+		 <ul class="grid-mode show-list fn-clear" id="contents">
+			<?range $k, $v := .list?>
+	        <li>
+				<a class="play-img" target="_self" href="/view/<?$v.tid?>">
+					<img class="lazy" onerror="javascript:this.src='/static/images/empty.gif';" src="/static/images/empty.gif" data-original="<?$v.img?>" alt="<?$v.title?>" />
+		            <label class="mask"></label>
+		            <label class="text"><?$v.stripe?></label>
+		                        
+				</a>
+	
+	            <h5><a target="_self" href="/view/<?$v.tid?>"><?$v.title?></a></h5>
+	            <p class="star">播放：<?$v.subtitle?></p>
+	
+	        </li>
+	  		<?end?>
+	      </ul>
+	<?end?>
+      <div class="ui-bar list-page fn-clear">
+		<?if .paginator.HasPages?>
+			<ul class="page">
+				<?if .paginator.HasPrev?>
+					<li><a target="_self" href="<?.paginator.PageLinkFirst?>">第一页</a></li>
+					<li><a target="_self" href="<?.paginator.PageLinkPrev?>">&laquo;</a></li>
+				<?else?>
+					<li class="disabled"><a>第一页</a></li>
+					<li class="disabled"><a>&laquo;</a></li>
+				<?end?>
+	
+			     <?range $index, $page := .paginator.Pages?> 
+					<li<?if $.paginator.IsActive .?> class="active"<?end?>> <a target="_self" href="<?$.paginator.PageLink $page?>"><?$page?></a></li>
+				<?end?>
+	
+			     <?if .paginator.HasNext?>
+					<li><a target="_self" href="<?.paginator.PageLinkNext?>">&raquo;</a></li>
+					<li><a target="_self" href="<?.paginator.PageLinkLast?>">最后一页</a></li>
+					<?else?>
+					<li class="disabled"><a>&raquo;</a></li>
+					<li class="disabled"><a>最后一页</a></li>
+				<?end?>
+			 </ul>
+		<?end?> 
+      </div>
+    </div>
+    <div class="qire-bar">
+      
+      <div class="ui-ranking">
+        <h3>排行榜</h3>
+        <ul class="ranking-list">
+		 	<?range $k, $v := .rank?>
+				<li><span><?$v.total_vv?></span><em <?if  lt $k 3?>class="stress"<?end?>><?$k | indexaddone?>.</em><a target="_self" href="/<?if eq $v.type "show"?>view<?else?>play<?end?>/<?$v.tid?>"><?$v.name?></a></li>
+			<?end?>
+		</ul>
+        <!-- // ranking-list end -->
+      </div> 
+
+
+    </div>
+  </div>
+</div>
+<script>
+
+var filter = {
+	"ob":'<?.ob?>', 
+	"genre":'<?.genre?>', 
+	"period":'<?.period?>', 
+	"releaseyear":'<?.releaseyear?>', 
+	"area":'<?.area?>', 
+	"tv_genre":'<?.tv_genre?>', 
+	"movie_genre":'<?.movie_genre?>',
+	"anime_genre":'<?.anime_genre?>',
+	"variety_genre":'<?.variety_genre?>',
+	"anime_agegroup":'<?.anime_agegroup?>',
+	"pay_type":'<?.pay_type?>'
+};
+
+for (k in filter){
+	$("#"+k+"_"+filter[k]).addClass("current");
+}
+
+function jump(cat, title, sort){
+	
+	cat = cat || ""
+	title = title || ""
+	sort = sort || "2"
+
+	var url = "/<?.type?>/?1";
+	
+	if (cat !=""){
+		filter[cat] = title;
+	}
+
+	if (sort != ""){
+		filter["ob"] = sort;
+	}
+
+	for (k in filter){
+		url += "&"+k+"=" + filter[k]
+	}
+	
+	window.location.href=url;
+}
+</script>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="referrer" content="never">
+<title></title>
+<link rel="stylesheet" href="/static/js/DPlayer/DPlayer.min.css"/>
+<style type="text/css">
+body, html, .dplayer {
+			padding: 0;
+			margin: 0;
+			width: 100%;
+			height: 100%;
+			background-color:#000;
+		}
+a {
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+<div id="player" class="dplayer"></div>
+
+<script src="/static/js/DPlayer/flv.min.js"></script>
+<script src="/static/js/DPlayer/hls.min.js"></script>
+<script src="/static/js/DPlayer/DPlayer.min.js"></script>
+
+
+<script type="text/javascript">
+  var isiPad = navigator.userAgent.match(/iPad|iPhone|Android|Linux|iPod/i) != null;
+  var url = decodeURIComponent("<?.url?>");
+  if(isiPad){
+	document.getElementById('player').innerHTML = '<video src='+url+' controls="controls" autoplay="autoplay" poster="loading.gif" width="100%" height="100%" x-webkit-airplay="allow"></video>';
+      }else {
+		var pic = "/static/loading.gif";
+		var dplayer = new DPlayer({
+			element: document.getElementById("player"),
+			autoplay: true,
+			video: {
+				url: url,
+                pic: pic
+			}
+		});
+       }
+</script>
+</body>
+</html>

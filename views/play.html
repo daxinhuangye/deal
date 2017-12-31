@@ -1,0 +1,228 @@
+<div class="bread-crumb-nav bread-crumb-nav-play">
+  <div class="layout fn-clear">
+
+    <ul class="bread-crumbs">
+      <li class="home"><a href="/">首页</a></li>
+      <li>
+		<?if eq .detail.sct "97"?>
+				<a href="/dianshiju/"><?.detail.cats?></a>
+			<?end?>
+			<?if eq .detail.sct "96"?>
+				<a href="/dianying/"><?.detail.cats?></a>
+			<?end?>
+			<?if eq .detail.sct "100"?>
+				<a href="/dongman/"><?.detail.cats?></a>
+			<?end?>
+			<?if eq .detail.sct "85"?>
+				<a href="/zongyi/"><?.detail.cats?></a>
+			<?end?>
+			<?if eq .detail.sct "99"?>
+				<a href="/game/"><?.detail.cats?></a>
+			<?end?>
+			<?if eq .detail.sct "94"?>
+				<a href="/gaoxiao/"><?.detail.cats?></a>
+			<?end?>
+	  </li>
+      <li><?.detail.first_line.title?></li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<div id="play-focus">
+  <div  class="layout fn-clear">
+
+	<div class="play_header">
+	    <div class="header2"><?.detail.first_line.title?></div>
+	</div>
+
+      <div id="a1" style="height:480px"></div>
+		<script type="text/javascript" src="/static/js/ckplayer/ckplayer.js?4" charset="utf-8"></script>
+		<script type="text/javascript">
+			var vid = encodeURIComponent(<?.vid?>);
+
+	  		var flashvars={
+	            f: '/static/js/ckplayer/m3u8.swf', //使用swf向播放器发送视频地址进行播放
+	            a: '/m3u8/?vid='+vid,   
+	            c: 0,      			//调用 ckplayer.js 配置播放器
+	            p: 1,      			//自动播放视频
+	            s: 4,      			//flash插件形式发送视频流地址给播放器进行播放
+	            e: 0,      			//
+	            g: <?.start?>,      //默认为0，开头跳过时间
+	            j: <?.end?>,      	//同上，默认为0，提前结束时间
+				lv:0				//直播为1.其余都是0, 
+	        };
+
+			var params={bgcolor:'#FFF',allowFullScreen:true,allowScriptAccess:'always',wmode:'transparent'};
+	       	
+			var video = ["/m3u8/?vid="+vid+"->video/m3u8"];
+
+            CKobject.embed('/static/js/ckplayer/ckplayer.swf', 'a1', 'ckplayer_a1', '100%', '100%', false, flashvars, video);
+
+
+	       // CKobject.embedSWF('/static/js/ckplayer/ckplayer.swf','a1','ckplayer_a1','100%','100%',flashvars, params);
+	
+		</script>
+
+  </div>
+</div>
+
+<div id="content" class="layout">
+ <!--  <div class="ui-box" id="juqing" >
+   <div class="ui-title">
+      <h3>剧情介绍</h3>
+    </div>
+    <div class="tjuqing"> 《神盾局特工》是复仇者联盟里面的分支剧情电视剧，目前播出到第四季熟悉Marvel漫画的人都知道，「S.H.I.E.L.D」是「Strategic Hazard Intervention Espionage Logistics Directorate」（国土战略防御攻击与后勤保障局，或称神盾局）的缩写，百度百科上有一个词条专门对其进行了解释。在今年的热门电影《复仇者联盟》（The Avengers）中，「S.H.I.E.L.D」的主管Nick Fury召集钢铁侠、美国上尉、绿巨人、黑寡妇、雷神索尔等超级英雄共同对抗企图统治地球的洛基（索尔的兄弟）。据称电视剧版《S.H.I.E.L.D》的剧本将由Joss Whedon亲自创作，首集也由他亲自执导，他的弟弟Jed Whedon和弟媳Maurissa Tancharoen将协助构思（他们曾和Joss Whedon共同创作网络剧《恐怖博士的欢唱博客》）。这是近年来电视广播网上第一个获得试映集预订的Marvel漫画改编项目。剧中的主要人物为：Skye，年近30年的「完美女性」，幽默、聪明、体贴他人、充满自信。她善于利用智慧和个人魅力来达到自己的目的。Grant Ward特工，典型的肉盾角色，冷酷到家。他行事鲁莽，有一点牛脾气，有时会搞砸人际关系。他平时很安静，是那种能够吸引你好感的人。Melinda May特工（温明娜），人送外号「The Calvary」（耶稣受难），是一个强悍的女战士，精通武器和飞机驾驶技术。她有过很不好的经历，因此她平时非常安静，而且人格有一点受损。在必要的时候，Melinda不惜违抗命令自行其事。Elizabeth Henstridge扮演Gemma Simmons特工，是个科学天才；Iain De Caestecker扮演Leo Fitz特工，是个技术专家。两人一同接受训练，生活中和执行任务时都喜欢待在一起——尽管他们一见面就吵个不停。他们有「Nerd」倾向，把彼此的关系看做兄妹之情。Jemma擅长生物化学方面的技术，而Leo擅长武器研发和相关技术。Brett Dalton扮演技艺高超的Grant特工，勇敢无惧、处事冷静，但不善与人交流。此前制片方已经承认《复仇者联盟》电影中的演员Clark Gregg将演出该剧，再次扮演电影中的角色Coulson特工。 </div>
+  </div>
+  <div class="ui-box" id="detail-list"><a name=""></a>
+    <div class="play-list-box" id="tyiyun-pl-list" >
+          <div class="caption fn-clear">
+              <h4><img src="http://css.313679.org/haojihk/images/playlogo/tyiyun.gif" alt="" /></h4>
+                                                        <div class="order">排序：<a class="desc" href="javascript:void(0);" data="0">降序</a></div>            </div>          <div class="content">
+            <ul class="play-list">
+                                          <a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-22.html">第22集                    <span class="new">new</span>                    </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-21.html">第21集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-20.html">第20集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-19.html">第19集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-18.html">第18集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-17.html">第17集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-16.html">第16集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-15.html">第15集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-14.html">第14集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-13.html">第13集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-12.html">第12集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-11.html">第11集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-10.html">第10集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-9.html">第9集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-8.html">第8集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-7.html">第7集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-6.html">第6集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-5.html">第5集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-4.html">第4集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-3.html">第3集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-2.html">第2集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-2-pid-1.html">第1集                                        </a>            </ul>
+          </div>
+        </div><div class="play-list-box" id="youyun-pl-list" >
+          <div class="caption fn-clear">
+              <h4><img src="http://css.313679.org/haojihk/images/playlogo/youyun.gif" alt="" /></h4>
+                                                        <div class="order">排序：<a class="desc" href="javascript:void(0);" data="1">降序</a></div>            </div>          <div class="content">
+            <ul class="play-list">
+                                          <a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-22.html">第22集                    <span class="new">new</span>                    </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-21.html">第21集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-20.html">第20集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-19.html">第19集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-18.html">第18集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-17.html">第17集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-16.html">第16集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-15.html">第15集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-14.html">第14集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-13.html">第13集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-12.html">第12集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-11.html">第11集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-10.html">第10集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-9.html">第09集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-8.html">第08集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-7.html">第07集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-6.html">第06集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-5.html">第05集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-4.html">第04集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-3.html">第03集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-2.html">第02集                                        </a><a target="_self" href="/index.php?s=vod-play-id-22275-sid-1-pid-1.html">第01集                                        </a>            </ul>
+          </div>
+        </div><div class="play-list-box" id="down-pl-list" >
+                    <div class="content">
+            <ul class="play-list">
+                                                      </ul>
+          </div>
+        </div>  </div>-->
+  <!--<div class="ui-box" id="play-help">
+    <div class="ui-title">
+      <h2><strong>播放必读</strong></h2>
+    </div>
+    <div class="play-help-item" id="xiguatip">
+      <h3>普通视频常见问题</h3>
+      <ul>
+        <li>
+          <label>常见问题一：</label>
+          海外地区可能无法播放,这个是正常的，如打开本页的播放窗口空白或有个是个大叉叉，请点击这里下载Flash 9插件,然后重启浏览器 </li>
+        <li>
+          <label>常见问题二：</label>
+          在已安装Flash的情况下，如打开的本页播放区域是空白一片，可以尝试刷新本页（网速慢使播放器加载稍慢)</li>
+        <li>
+          <label>常见问题三：</label>
+          节目出现双语对白，可打开电脑上音量调节功能，拉动平衡杆到任意一边调整语种。</li>
+        <li>
+          <label>常见问题四：</label>
+          为何有的节目看到一半就断掉或没有响应了？最有效的解决方法是：IE浏览器--工具-- Internet选项--点击"删除文件"按钮，然后关闭浏览器重新打开</li>
+        <li>
+          <label>播放技巧一：</label>
+          部分视频如果出现卡的情况，可暂停一会，让其缓冲后再播放</li>
+        <li>
+          <label>播放技巧二：</label>
+          可提前打开下一集的页面，播放后按暂停（不要关闭），让其缓冲，这样看完这集就可以很流畅的看下一集了。</li>
+      </ul>
+    </div>
+  </div>-->
+  <div id="content" class="layout">
+
+	<div class="ui-box" id="detail-list"><a name=""></a>
+    	<div class="play-list-box" id="tyiyun-pl-list" >
+          
+			<div class="caption fn-clear">
+	            <h2><strong>资源列表</strong></h2>
+	
+	           <!-- <div class="order">排序：<a class="desc" href="javascript:void(0);" switch="con-tyiyun-1">降序</a></div>-->
+	        </div>
+
+          	<div class="content">
+            	<ul class="play-list" id="con-tyiyun-1">
+					<?range $k, $v := .list?>
+  						<a target="_self" href="/play/<?$v.videoid?>"><?$v.title?>                
+							<?if eq $v.is_new "1"?><span class="new">new</span> <?end?>                      
+						</a>  
+					<?end?>
+        
+				</ul>
+          	</div>
+	    </div>
+
+	</div>
+
+
+    <div class="ui-box" id="like-focus">
+      <div class="detail-related fn-clear">
+        <h5>除了<strong><?.detail.first_line.title?></strong>你也可能喜欢以下影片：</h5>
+        <p class="bd"></p>
+      </div>
+      <ul class="img-list">
+		<?range $k, $v := .recommand?>
+		<?if  lt $k 7?>
+        <li>
+			<a class="play-img" target="_self"  href="/<?if eq $v.type "1"?>play<?else?>view<?end?>/<?$v.codeId?>"><img onerror="javascript:this.src='/static/images/empty.gif'"  src="<?$v.picUrl?>" alt="<?$v.title?>">
+            	<label class="mask"></label>
+            	<label class="text">播放：<?$v.playAmount?></label>
+            </a>
+            <h5><a target="_self"  href="/<?if eq $v.type "1"?>play<?else?>view<?end?>/<?$v.codeId?>"  title="<?$v.title?>" ><?$v.title?></a></h5>
+          </li>
+		<?end?>
+		 <?end?>
+		</ul>
+      <ul class="txt-list txt-list-small">
+		<?range $k, $v := .recommand?>
+		<?if  gt $k 6?>
+			<li><span><?$k | indexaddone?>.</span><a href="/<?if eq $v.type "1"?>play<?else?>view<?end?>/<?$v.codeId?>" title="<?$v.title?>" target="_blank"><?$v.title?></a></li>
+		<?end?>
+		<?end?>
+      </ul>
+    </div>
+    
+    <div class="ui-box" id="juqing">
+   <div class="ui-title">
+      <h3>剧情介绍</h3>
+    </div>
+    <div class="tjuqing"> <?.detail.desc?></div>
+  </div>
+  </div>
+</div>
+
+
+ <script>
+    if(PlayHistoryObj){
+	    var vod_id = "38338" ;
+	    var vod_pid = "1" ;
+	    var vod_sid = "1" ;
+		  var vod_name = "走火交易" ;
+	  	var url_name = "高清" ;
+		  var vod_readurl = "/dongzuopian/zouhuojiaoyi/";
+    	var json = {
+	    	'vod_id' : vod_id ,
+		    'vod_pid': vod_pid,
+		    'vod_sid': vod_sid,
+	    	'vod_name' : vod_name,
+	    	'url_name' : url_name,
+    	} ;
+    	PlayHistoryObj.addPlayHistory(json, vod_readurl, window.location.href);
+    }
+
+    function playerstop() {
+		var vid = '<?.next.Videoid?>';
+
+		if (vid !=''){
+			 window.location.href="/play/<?.next.Videoid?>";
+		}
+    }
+
+	//加载失败
+	var _m=0;
+	function errorHandler(){
+		alert("加载失败");
+	}
+	function timeHandler(vid) {
+
+	}
+
+
+
+</script> 
+
+
