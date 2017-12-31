@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"Deal/models"
+
 	_ "github.com/astaxie/beego"
 )
 
@@ -17,8 +18,9 @@ func (this *IndexController) Prepare() {
 //默认网站首页
 func (this *IndexController) Get() {
 
-	this.Data["type"] = "index"
-	this.Display("index", true)
+	huobi := models.Huobi{}
+	data := huobi.Depth()
+	this.Ctx.WriteString(data)
 
 }
 
@@ -26,6 +28,6 @@ func (this *IndexController) Get() {
 func (this *IndexController) Test() {
 
 	huobi := models.Huobi{}
-	data := huobi.Trade()
+	data := huobi.GetAccounts()
 	this.Ctx.WriteString(data)
 }
