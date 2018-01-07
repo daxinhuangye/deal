@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"Deal/models"
-
+	_ "Deal/models"
+	"Deal/service"
 	_ "github.com/astaxie/beego"
 )
 
@@ -18,16 +18,23 @@ func (this *IndexController) Prepare() {
 //默认网站首页
 func (this *IndexController) Get() {
 
-	huobi := models.Huobi{}
-	data := huobi.Depth()
-	this.Ctx.WriteString(data)
-
 }
 
 //默认网站首页
-func (this *IndexController) Test() {
+func (this *IndexController) Start() {
 
-	huobi := models.Huobi{}
-	data := huobi.GetAccounts()
-	this.Ctx.WriteString(data)
+	//获取实例对象
+	auto := service.GetInstance()
+	auto.Start()
+	this.Ctx.WriteString("停止")
+}
+
+//默认网站首页
+func (this *IndexController) Stop() {
+
+	//获取实例对象
+	auto := service.GetInstance()
+	auto.Stop()
+	this.Ctx.WriteString("停止")
+
 }
