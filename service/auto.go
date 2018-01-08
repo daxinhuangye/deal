@@ -2,10 +2,11 @@ package service
 
 import (
 	"Deal/models"
-	"github.com/astaxie/beego"
 	"math"
 	"tsEngine/tsDb"
 	"tsEngine/tsMail"
+
+	"github.com/astaxie/beego"
 )
 
 type Auto struct {
@@ -53,14 +54,14 @@ func (this *Auto) sendMail() {
 }
 
 //盈利计算
-func (this *Auto) profit(buy, rate_1, sell, rate_2 float64) float64 {
-	beego.Trace("汇率1：", rate_1, "汇率2：", rate_2)
+func (this *Auto) profit(buy, rate_1, sell, rate_2 float64) (float64, float64) {
+
 	buy_cny := buy * rate_1
 	sell_cny := sell * rate_2
-	beego.Trace("买：", buy_cny, "卖：", sell_cny)
-
-	temp := ((sell_cny - buy_cny) / buy_cny) * 100
-	return temp
+	//lirun := sell_cny - buy_cny - "平台交易费" - "平台币种转账费"
+	lirun := sell_cny - buy_cny
+	rate := (lirun / buy_cny) * 100
+	return rate, lirun
 }
 
 //自动交易AI
@@ -108,6 +109,8 @@ func (this *Auto) goAI() {
 	}
 	//启动前先检测是否有没有完成的交易
 
+	orders := oHuobi.GetOrders("xrpusdt", "", "", "", "submitted", "", "", "")
+	beego.Trace("交易列表：", orders)
 	//自动交易AI
 	//this.working = false
 	for {
@@ -117,32 +120,40 @@ func (this *Auto) goAI() {
 			for _, v := range symbol_list {
 				huobi_buy, huobi_sell := oHuobi.Depth(v["Huobi"].(string), v["Amount"].(float64))
 				bithumb_buy, bithumb_sell := oBithumb.Depth(v["Bithumb"].(string), v["Amount"].(float64))
-				beego.Trace("韩国：", bithumb_buy, bithumb_sell)
+
 				//有任何一个数据没有获得，表示有问题放弃交易
 				if huobi_buy == 0 || huobi_sell == 0 || bithumb_buy == 0 || bithumb_sell == 0 {
 					continue
 				}
 				//从A买入卖到B的盈利百分比
-				zhang1 := this.profit(huobi_buy, oHuobi.Rate, bithumb_sell, oBithumb.Rate)
-
+				zhang1, money1 := this.profit(huobi_buy, oHuobi.Rate, bithumb_sell, oBithumb.Rate)
+				beego.Trace("火币网买入韩国卖赢利：", zhang1, "挣了多少：", money1)
 				//从B买入卖到A的盈利百分比
-				zhang2 := this.profit(bithumb_buy, oBithumb.Rate, huobi_sell, oHuobi.Rate)
-				beego.Trace("涨幅比例：", zhang1, zhang2)
+				zhang2, money2 := this.profit(bithumb_buy, oBithumb.Rate, huobi_sell, oHuobi.Rate)
+				beego.Trace("韩国买入火币网卖赢利：", zhang2, "挣了多少：", money2)
 				//如果A涨幅规则匹配
 				if int64(math.Ceil(zhang1)) >= v["Surplus"].(int64) {
-					//在A下单
-					order_id := oHuobi.CreateOrder(beego.AppConfig.String("HuobiAccountId"), v["Amount"].(float64), huobi_buy, v["Huobi"].(string), "buy-limit")
-
-					if order_id == "" {
-						beego.Error("下单失败，进行下个币种的交易逻辑")
-						continue
-					}
-					/*
-						//监视订单是否成交
-						if oHuobi.OrderDeal() {
-							//如果A站成交，B站开始交易
+					for {
+						order_id := oHuobi.CreateOrder(beego.AppConfig.String("HuobiAccountId"), v["Amount"].(float64), huobi_buy, v["Huobi"].(string), "buy-limit")
+						if order_id != "" {
+							break
 						}
+					}
+					//在A下单
+					//停止交易
+					this.Stop()
+					/*
+						if order_id == "" {
+							beego.Error("下单失败，进行下个币种的交易逻辑")
+							continue
+						}
+
+							//监视订单是否成交
+							if oHuobi.OrderDeal() {
+								//如果A站成交，B站开始交易
+							}
 					*/
+
 				}
 			}
 

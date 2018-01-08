@@ -13,11 +13,12 @@ import (
 	"tsEngine/tsTime"
 
 	_ "encoding/hex"
+	"net/url"
+	"tsEngine/tsCrypto"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/httplib"
 	"github.com/tidwall/gjson"
-	"net/url"
-	"tsEngine/tsCrypto"
 )
 
 //火币api接口
@@ -38,20 +39,21 @@ const (
 func (this *Huobi) Depth(symbol string, num float64) (float64, float64) {
 
 	api := "https://" + HB_HOST + "/market/depth?type=step5&symbol=" + symbol
-
+	beego.Trace("huobiApi:", api)
 	content := this.request(api, []string{}, []string{})
+	beego.Trace("返回值：", content)
 	if content == "" {
 		return 0, 0
 	}
 
 	var total, buy, sell float64
-	//卖盘
+	//卖盘里算买入的钱
 	asks := gjson.Get(content, "tick.asks").Array()
 	for _, v := range asks {
 		temp := v.Array()
 		total += temp[1].Float()
 		if total >= num {
-			buy = temp[0].Float() * this.Rate
+			buy = temp[0].Float()
 			break
 		}
 
@@ -59,20 +61,19 @@ func (this *Huobi) Depth(symbol string, num float64) (float64, float64) {
 
 	total = 0
 
-	//买盘
+	//买盘里算卖的钱
 	bids := gjson.Get(content, "tick.bids").Array()
 
-	for k, v := range bids {
+	for _, v := range bids {
 		temp := v.Array()
-		if k == 0 {
-			sell = temp[0].Float() * this.Rate
-		}
 		total += temp[1].Float()
+		if total >= num {
+			sell = temp[0].Float()
+			break
+		}
 
 	}
-	if total < num {
-		sell = 0
-	}
+
 	return buy, sell
 
 }
@@ -113,16 +114,26 @@ func (this *Huobi) GetOrders(symbol, types, start_date, end_date, states, from, 
 
 	params := []string{"symbol=" + symbol, "types=" + types, "start-date=" + start_date, "end-date=" + end_date, "states=" + states, "from=" + from, "direct=" + direct, "size=" + size}
 
-	return this.keyGet(path, params)
+	content := this.keyGet(path, params)
+	if content == "" {
+		return ""
+	}
 
+	status := gjson.Get(content, "status").String()
+	if status != "ok" {
+		err_msg := gjson.Get(content, "err-msg").String()
+		beego.Error(err_msg)
+		return ""
+	}
+	return content
 }
 
 //创建订单
 func (this *Huobi) CreateOrder(account_id string, amount, price float64, symbol, _type string) string {
 
 	post_key := []string{"account-id", "amount", "price", "symbol", "type", "source"}
-	post_value := []string{account_id, fmt.Sprintf("%f", amount), fmt.Sprintf("%f", price), symbol, _type, "api"}
-
+	post_value := []string{account_id, "1", "2.3510", symbol, _type, "api"}
+	beego.Trace(amount, price)
 	path := "/v1/order/orders/place"
 
 	content := this.keyPost(path, post_key, post_value)
@@ -222,10 +233,11 @@ func (this *Huobi) keyPost(path string, key, value []string) string {
 	api := "https://" + HB_HOST + path + "?"
 
 	params := []string{}
-	for k, v := range key {
-		params = append(params, v+"="+value[k])
-	}
-
+	/*
+		for k, v := range key {
+			params = append(params, v+"="+value[k])
+		}
+	*/
 	params = append(params, "SignatureMethod=HmacSHA256")
 	params = append(params, "SignatureVersion=2")
 	params = append(params, "Timestamp="+url.QueryEscape(tsTime.CurrSeUtcFormat("2006-01-02T15:04:05")))

@@ -5,13 +5,14 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/httplib"
-	"github.com/tidwall/gjson"
 	"net/url"
 	"strings"
 	"time"
 	"tsEngine/tsCrypto"
+
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/httplib"
+	"github.com/tidwall/gjson"
 )
 
 //韩国交易平台api接口
@@ -31,6 +32,7 @@ func (this *Bithumb) Depth(symbol string, num float64) (float64, float64) {
 	path := fmt.Sprintf("/public/orderbook/%s?group_orders=%d&count=%d", symbol, 1, 20)
 
 	content := this.publicRequest(path)
+	beego.Trace("韩国行情：", content)
 	if content == "" {
 		return 0, 0
 	}
