@@ -63,11 +63,33 @@ func (this *IndexController) Join() {
 	return
 }
 func (this *IndexController) Send() {
-	uname := "2222"
-	p := "uuuuuu"
 
-	beego.Info("user:", uname, "content:", string(p))
-	publish <- newEvent(models.EVENT_MESSAGE, uname, string(p))
+	go func() {
+		obj := models.Huobi{}
+		count := 0
+		for {
+			count++
+			buy, sell := obj.Depth("xrpusdt", 10)
+			uname := "Huobi:" + fmt.Sprintf("请求次数：%d", count)
+			data := fmt.Sprintf("当前买入:%f;当前卖出：%f", buy, sell)
+			beego.Info("user:", uname, "content:", data)
+			publish <- newEvent(models.EVENT_MESSAGE, uname, data)
+		}
+	}()
+
+	go func() {
+		obj := models.Bithumb{}
+		count := 0
+		for {
+			count++
+			buy, sell := obj.Depth("XRP", 10)
+			uname := "Bithumb:" + fmt.Sprintf("请求次数：%d", count)
+			data := fmt.Sprintf("当前买入:%f;当前卖出：%f", buy, sell)
+			beego.Info("user:", uname, "content:", data)
+			publish <- newEvent(models.EVENT_MESSAGE, uname, data)
+		}
+	}()
+
 	this.Ctx.WriteString("44444444")
 }
 
