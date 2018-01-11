@@ -4,8 +4,9 @@ import (
 	"Deal/models"
 	"Deal/service"
 	"fmt"
-	_ "github.com/astaxie/beego"
 	"reflect"
+
+	"github.com/astaxie/beego"
 )
 
 type IndexController struct {
@@ -17,8 +18,54 @@ func (this *IndexController) Prepare() {
 
 }
 
+func (this *IndexController) Test() {
+	obj := models.Bithumb{}
+	/*
+		price := int64(2510)
+		num := float64(10)
+		symbol := "XRP"
+		_type := "ask"
+		con := obj.CreateOrder(price, num, symbol, _type)
+	*/
+	con := obj.GetOrders()
+	beego.Trace(con)
+	this.Ctx.WriteString(con)
+
+}
+
 //默认网站首页
 func (this *IndexController) Get() {
+	this.Display("index", false)
+}
+
+// Join method handles POST requests for AppController.
+func (this *IndexController) Join() {
+	// Get form value.
+	uname := this.GetString("uname")
+	tech := this.GetString("tech")
+
+	// Check valid.
+	if len(uname) == 0 {
+		this.Redirect("/", 302)
+		return
+	}
+
+	switch tech {
+	case "longpolling":
+		this.Redirect("/lp?uname="+uname, 302)
+	case "websocket":
+		this.Redirect("/ws?uname="+uname, 302)
+	default:
+		this.Redirect("/", 302)
+	}
+
+	// Usually put return after redirect.
+	return
+}
+
+//默认网站首页
+func (this *IndexController) Getbak() {
+
 	//obj := make(map[string]models.Bithumb)
 	obj := models.Bithumb{}
 

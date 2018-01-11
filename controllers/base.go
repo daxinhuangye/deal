@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/beego/i18n"
 	"strings"
 	"tsEngine/tsString"
 	"tsEngine/tsTime"
+
+	"github.com/astaxie/beego"
+	"github.com/beego/i18n"
 )
 
 type BaseController struct {
@@ -36,6 +37,26 @@ func init() {
 }
 
 func (this *BaseController) Display(tpl string, layout bool) {
+
+	// Reset language option.
+	this.Lang = "" // This field is from i18n.Locale.
+
+	// 1. Get language information from 'Accept-Language'.
+	al := this.Ctx.Request.Header.Get("Accept-Language")
+	if len(al) > 4 {
+		al = al[:5] // Only compare first 5 letters.
+		if i18n.IsExist(al) {
+			this.Lang = al
+		}
+	}
+
+	// 2. Default language is English.
+	if len(this.Lang) == 0 {
+		this.Lang = "en-US"
+	}
+
+	// Set template level language option.
+	this.Data["Lang"] = this.Lang
 
 	this.Data["Version"] = beego.AppConfig.String("Version")
 

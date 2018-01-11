@@ -114,11 +114,11 @@ func (this *Bithumb) GetWalletAddress() string {
 }
 
 //获取订单列表
-func (this *Bithumb) GetOrders(order_id string) string {
+func (this *Bithumb) GetOrders() string {
 
 	path := "/info/orders"
-	key := []string{"order_id"}
-	value := []string{order_id}
+	key := []string{}
+	value := []string{}
 	content := this.privateRequest(path, key, value)
 
 	return content
@@ -126,11 +126,11 @@ func (this *Bithumb) GetOrders(order_id string) string {
 }
 
 //创建订单
-func (this *Bithumb) CreateOrder(price, amount float64, symbol, _type string) string {
+func (this *Bithumb) CreateOrder(price int64, amount float64, symbol, _type string) string {
 
 	path := "/trade/place"
 	key := []string{"order_currency", "Payment_currency", "units", "price", "type"}
-	value := []string{symbol, "KRW", fmt.Sprintf("%f", amount), fmt.Sprintf("%f", price), _type}
+	value := []string{symbol, "KRW", fmt.Sprintf("%.4f", amount), fmt.Sprintf("%d", price), _type}
 	content := this.privateRequest(path, key, value)
 
 	return content
