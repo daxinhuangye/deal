@@ -17,8 +17,8 @@ import (
 
 //韩国交易平台api接口
 type Bithumb struct {
-	Rate float64 //汇率
-	Fee  float64 //手续费
+	Rate      float64 //汇率
+	AccountId string  //账号id
 }
 
 const (
@@ -69,16 +69,22 @@ func (this *Bithumb) Depth(symbol string, num float64) (float64, float64) {
 
 //获取账户信息
 func (this *Bithumb) GetAccounts() string {
+	if this.AccountId != "" {
+		return this.AccountId
+	}
 	path := "/info/account"
 
-	content := this.privateRequest(path, []string{}, []string{})
-
+	key := []string{"order_currency", "payment_currency"}
+	value := []string{"BTC", "KRW"}
+	content := this.privateRequest(path, key, value)
+	beego.Trace(content)
 	if content == "" {
 		return ""
 	}
 
-	account_id := gjson.Get(content, "data.account_id").String()
-	return account_id
+	this.AccountId = gjson.Get(content, "data.account_id").String()
+
+	return this.AccountId
 
 }
 
@@ -91,14 +97,14 @@ func (this *Bithumb) GetBalance() string {
 	if content == "" {
 		return ""
 	}
-
-	account_id := gjson.Get(content, "data.account_id").String()
-	return account_id
+	beego.Trace(content)
+	krw := gjson.Get(content, "data.total_krw").String()
+	return krw
 
 }
 
 //获取钱包地址
-func GetWalletAddress(this *Bithumb) string {
+func (this *Bithumb) GetWalletAddress() string {
 
 	path := "/info/wallet_address"
 
@@ -108,24 +114,24 @@ func GetWalletAddress(this *Bithumb) string {
 }
 
 //获取订单列表
-func (this *Bithumb) GetOrders(symbol, types, start_date, end_date, states, from, direct, size string) string {
+func (this *Bithumb) GetOrders(order_id string) string {
 
-	/*
-		path := "/v1/order/orders"
+	path := "/info/orders"
+	key := []string{"order_id"}
+	value := []string{order_id}
+	content := this.privateRequest(path, key, value)
 
-		params := []string{"symbol=" + symbol, "types=" + types, "start-date=" + start_date, "end-date=" + end_date, "states=" + states, "from=" + from, "direct=" + direct, "size=" + size}
+	return content
 
-		return this.privateRequest(path, params)
-	*/
-	return ""
 }
 
 //创建订单
-func (this *Bithumb) CreateOrder(amount, source, symbol, _type, price string) string {
+func (this *Bithumb) CreateOrder(price, amount float64, symbol, _type string) string {
 
 	path := "/trade/place"
-
-	content := this.privateRequest(path, []string{}, []string{})
+	key := []string{"order_currency", "Payment_currency", "units", "price", "type"}
+	value := []string{symbol, "KRW", fmt.Sprintf("%f", amount), fmt.Sprintf("%f", price), _type}
+	content := this.privateRequest(path, key, value)
 
 	return content
 
@@ -232,7 +238,8 @@ func (this *Bithumb) privateRequest(path string, key, value []string) string {
 	key = append(key, "endpoint")
 	value = append(value, url.QueryEscape(path))
 
-	temp := []string{"order_currency=BTC", "payment_currency=KRW"}
+	//temp := []string{"order_currency=BTC", "payment_currency=KRW"}
+	temp := []string{}
 	for k, v := range key {
 		temp = append(temp, v+"="+value[k])
 	}
@@ -268,6 +275,7 @@ func (this *Bithumb) privateRequest(path string, key, value []string) string {
 	if status != "0000" {
 		err_msg := gjson.Get(content, "message").String()
 		beego.Error(err_msg)
+		beego.Trace(content)
 		return ""
 	}
 

@@ -12,7 +12,7 @@ type Settings struct {
 	PricePrecision  int64   // 单价精度
 	AmountPrecision int64   // 数量精度
 	DealCost        float64 // 交易费
-	Payment         float64 // 手续费
+	Fee             float64 // 手续费
 }
 
 func init() {

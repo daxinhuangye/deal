@@ -14,6 +14,7 @@ type Auto struct {
 	platformList []orm.Params
 	symbolList   []orm.Params
 	settingList  []orm.Params
+	obj          map[string]interface{}
 }
 
 var instance *Auto
@@ -60,7 +61,7 @@ func (this *Auto) Start() {
 			beego.Error("配置错误")
 			return
 		}
-
+		this.obj["huobi"] = models.Huobi{}
 		go this.goAI()
 	}
 
@@ -96,7 +97,7 @@ func (this *Auto) getSetting(pid, sid int64) orm.Params {
 }
 
 //盈利计算
-func (this *Auto) getProfit(buy, rate_1, sell, rate_2, deal_cost, payment float64) (float64, float64) {
+func (this *Auto) getProfit(buy, rate_1, sell, rate_2, deal_cost, fee float64) (float64, float64) {
 
 	buy_cny := buy * rate_1
 	sell_cny := sell * rate_2
@@ -161,11 +162,11 @@ func (this *Auto) goAI() {
 					continue
 				}
 				//从A买入卖到B的盈利百分比
-				zhang1, money1 := this.getProfit(huobi_buy, oHuobi.Rate, bithumb_sell, oBithumb.Rate, huobi_settings["DealCost"].(float64), huobi_settings["Payment"].(float64))
+				zhang1, money1 := this.getProfit(huobi_buy, oHuobi.Rate, bithumb_sell, oBithumb.Rate, huobi_settings["DealCost"].(float64), huobi_settings["Fee"].(float64))
 				beego.Trace("火币网买入韩国卖赢利：", zhang1, "挣了多少：", money1)
 
 				//从B买入卖到A的盈利百分比
-				zhang2, money2 := this.getProfit(bithumb_buy, oBithumb.Rate, huobi_sell, oHuobi.Rate, bithumb_settings["DealCost"].(float64), bithumb_settings["Payment"].(float64))
+				zhang2, money2 := this.getProfit(bithumb_buy, oBithumb.Rate, huobi_sell, oHuobi.Rate, bithumb_settings["DealCost"].(float64), bithumb_settings["Fee"].(float64))
 
 				beego.Trace("韩国买入火币网卖赢利：", zhang2, "挣了多少：", money2)
 				//如果A涨幅规则匹配

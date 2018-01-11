@@ -2,7 +2,6 @@ package main
 
 import (
 	_ "Deal/routers"
-	"Deal/service"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"tsEngine/tsDb"
@@ -29,10 +28,6 @@ func main() {
 
 	//数据库连接
 	tsDb.ConnectDb()
-
-	//获取实例对象
-	auto := service.GetInstance()
-	auto.Start()
 
 	beego.Run()
 }
