@@ -2,11 +2,12 @@ package service
 
 import (
 	"Deal/models"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/orm"
 	"math"
 	"tsEngine/tsDb"
 	"tsEngine/tsMail"
+
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 )
 
 type Auto struct {
@@ -174,7 +175,7 @@ func (this *Auto) goAI() {
 					beego.Trace("开始下单")
 					//在A下单
 					huobi_buy = huobi_buy - 1
-					order_id := oHuobi.CreateOrder(beego.AppConfig.String("HuobiAccountId"), huobi_buy, v["Amount"].(float64), v["Huobi"].(string), "buy-limit", huobi_settings["PricePrecision"].(int64), huobi_settings["AmountPrecision"].(int64))
+					order_id := oHuobi.CreateOrder(huobi_buy, v["Amount"].(float64), v["Huobi"].(string), "buy-limit", huobi_settings["PricePrecision"].(int64), huobi_settings["AmountPrecision"].(int64))
 					if order_id == "" {
 						beego.Error("下单失败，进行下个币种的交易逻辑")
 						continue

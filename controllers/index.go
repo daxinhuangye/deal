@@ -20,14 +20,14 @@ func (this *IndexController) Prepare() {
 
 func (this *IndexController) Test() {
 	obj := models.Bithumb{}
-	/*
-		price := int64(2510)
-		num := float64(10)
-		symbol := "XRP"
-		_type := "ask"
-		con := obj.CreateOrder(price, num, symbol, _type)
-	*/
-	con := obj.GetOrders()
+
+	price := int64(2510)
+	num := float64(10)
+	symbol := "XRP"
+	_type := "ask"
+	con := obj.CreateOrder(price, num, symbol, _type)
+
+	//con := obj.GetOrders()
 	beego.Trace(con)
 	this.Ctx.WriteString(con)
 
@@ -61,6 +61,14 @@ func (this *IndexController) Join() {
 
 	// Usually put return after redirect.
 	return
+}
+func (this *IndexController) Send() {
+	uname := "2222"
+	p := "uuuuuu"
+
+	beego.Info("user:", uname, "content:", string(p))
+	publish <- newEvent(models.EVENT_MESSAGE, uname, string(p))
+	this.Ctx.WriteString("44444444")
 }
 
 //默认网站首页

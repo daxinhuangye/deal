@@ -5,9 +5,6 @@ import (
 	"crypto/sha256"
 	_ "encoding/hex"
 	"fmt"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/httplib"
-	"github.com/tidwall/gjson"
 	"net/url"
 	_ "reflect"
 	"sort"
@@ -15,12 +12,16 @@ import (
 	"time"
 	"tsEngine/tsCrypto"
 	"tsEngine/tsTime"
+
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/httplib"
+	"github.com/tidwall/gjson"
 )
 
 //火币api接口
 type Huobi struct {
-	Rate float64 //汇率
-	Fee  float64 //手续费
+	Rate      float64 //汇率
+	AccountId string  //账号id
 }
 
 //火币api接口
@@ -88,6 +89,9 @@ func (this *Huobi) GetSymbols() string {
 
 //获取账户信息
 func (this *Huobi) GetAccounts() string {
+	if this.AccountId != "" {
+		return this.AccountId
+	}
 	path := "/v1/account/accounts"
 	params := []string{}
 	api := "https://" + HB_HOST + path + "?" + this.createSign("GET", path, params)
@@ -131,7 +135,7 @@ func (this *Huobi) GetOrders(symbol, types, start_date, end_date, states, from, 
 }
 
 //创建订单
-func (this *Huobi) CreateOrder(account_id string, price, amount float64, symbol, _type string, PricePrecision, AmountPrecision int64) string {
+func (this *Huobi) CreateOrder(price, amount float64, symbol, _type string, PricePrecision, AmountPrecision int64) string {
 
 	var postData struct {
 		AccountId string `json:"account-id"`
@@ -142,7 +146,7 @@ func (this *Huobi) CreateOrder(account_id string, price, amount float64, symbol,
 		Symbol    string `json:"symbol"`
 	}
 
-	postData.AccountId = account_id
+	postData.AccountId = this.GetAccounts()
 	//设置精度
 	price_format := "%." + fmt.Sprintf("%d", PricePrecision) + "f"
 	amount_format := "%." + fmt.Sprintf("%d", AmountPrecision) + "f"

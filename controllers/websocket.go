@@ -57,6 +57,7 @@ func (this *WebSocketController) Join() {
 		if err != nil {
 			return
 		}
+		beego.Info("user:", uname, "content:", string(p))
 		publish <- newEvent(models.EVENT_MESSAGE, uname, string(p))
 	}
 	return

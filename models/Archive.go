@@ -7,9 +7,9 @@ import (
 type EventType int
 
 const (
-	EVENT_JOIN = iota
-	EVENT_LEAVE
-	EVENT_MESSAGE
+	EVENT_JOIN    = iota //0
+	EVENT_LEAVE          //1
+	EVENT_MESSAGE        //2
 )
 
 type Event struct {

@@ -133,7 +133,12 @@ func (this *Bithumb) CreateOrder(price int64, amount float64, symbol, _type stri
 	value := []string{symbol, "KRW", fmt.Sprintf("%.4f", amount), fmt.Sprintf("%d", price), _type}
 	content := this.privateRequest(path, key, value)
 
-	return content
+	if content == "" {
+		return ""
+	}
+
+	order_id := gjson.Get(content, "order_id").String()
+	return order_id
 
 }
 
