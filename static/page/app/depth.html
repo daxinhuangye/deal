@@ -1,0 +1,95 @@
+<!-- Page Header Start -->
+<div class="pageheader">
+    <h2><i class="fa fa-line-chart"></i> 价格监控 </h2>
+
+    <div class="breadcrumb-wrapper hidden-xs"><span class="label">当前位置:</span>
+        <ol class="breadcrumb">
+            <li><a href="#"> Home </a></li>
+
+        </ol>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<!-- Flot Chart Body Start -->
+<div class="page">
+    <div class="row">
+        <div class="col-md-9">
+
+            <div class="row">
+
+                <div class="col-md-4" ng-repeat="(key, symbol) in depth ">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">{{key}}价格</h3>
+                        </div>
+                        <div class="panel-body pad-10">
+                            <table class="table table-striped">
+                                <th>平台</th>
+                                <th>卖盘</th>
+                                <th>买盘</th>
+                                <tr  ng-repeat="item in symbol">
+                                    <td>{{platform[item.platform]}}</td>
+                                    <td>{{item._bids}}</td>
+                                    <td>{{item._asks}}</td>
+                                </tr>
+                                <tr>
+                                    <td>差价：</td>
+                                    <td>{{profit[key].percent | number:2}}%</td>
+                                    <td>{{profit[key].money| number:2}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="row">
+                <div class="col-md-12">
+
+
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">可交易的订单</h3>
+                        </div>
+                        <div class="panel-body pad-10">
+                            <div   data-slim-scroll data-scroll-height="600" >
+
+                                <table class="table table-hover" style="width:100%">
+                                    <tbody >
+
+                                    <tr  id="message" ng-repeat="msg in message track by $index">
+                                        <td class="pad-10 cursor">
+                                            <span class="fa fa-home"></span>
+                                        </td>
+
+
+                                        <td class="pad-10">
+                                            {{msg}}
+                                        </td>
+
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+<!-- Flot Chart Body End -->

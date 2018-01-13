@@ -214,7 +214,7 @@ func (this *Bithumb) publicRequest(path string) string {
 	curl := httplib.Get(BT_HOST + path)
 
 	//设置超时时间 2秒链接，3秒读数据
-	curl.SetTimeout(3*time.Second, 3*time.Second)
+	curl.SetTimeout(5*time.Second, 5*time.Second)
 
 	//获取请求的内容
 	temp, err := curl.Bytes()
@@ -265,7 +265,7 @@ func (this *Bithumb) privateRequest(path string, key, value []string) string {
 	curl.Body(params)
 
 	//设置超时时间 2秒链接，3秒读数据
-	curl.SetTimeout(3*time.Second, 3*time.Second)
+	curl.SetTimeout(5*time.Second, 5*time.Second)
 
 	//获取请求的内容
 	data, err := curl.Bytes()

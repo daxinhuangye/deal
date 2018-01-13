@@ -4,9 +4,12 @@ import (
 	"Deal/models"
 	"Deal/service"
 	"fmt"
-	"reflect"
-
 	"github.com/astaxie/beego"
+	"reflect"
+	"strings"
+	"time"
+	"tsEngine/tsDb"
+	"tsEngine/tsTime"
 )
 
 type IndexController struct {
@@ -38,57 +41,63 @@ func (this *IndexController) Get() {
 	this.Display("index", false)
 }
 
-// Join method handles POST requests for AppController.
-func (this *IndexController) Join() {
-	// Get form value.
-	uname := this.GetString("uname")
-	tech := this.GetString("tech")
+func GetDepth(platform string, symbol string) {
+	depth := make(map[string]string)
+	switch platform {
+	case "huobi":
+		obj := models.Huobi{}
+		_symbol := strings.ToLower(symbol) + "usdt"
+		for {
 
-	// Check valid.
-	if len(uname) == 0 {
-		this.Redirect("/", 302)
-		return
+			buy, sell := obj.Depth(_symbol, 0)
+			key := fmt.Sprintf("huobi_%s", symbol)
+			value := fmt.Sprintf("%f_%f", buy, sell)
+			if buy != 0 && sell != 0 && depth[key] != value {
+				depth[key] = value
+				_buy := buy * 7
+				_sell := sell * 7
+				timestamp := tsTime.CurrSe()
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":"huobi", "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
+
+				publish <- newEvent(models.EVENT_MESSAGE, 0, data)
+			}
+
+			time.Sleep(1 * time.Second)
+		}
+
+	case "bithumb":
+		obj := models.Bithumb{}
+		for {
+
+			buy, sell := obj.Depth(symbol, 0)
+			key := fmt.Sprintf("bithumb_%s", symbol)
+			value := fmt.Sprintf("%f_%f", buy, sell)
+			if buy != 0 && sell != 0 && depth[key] != value {
+				depth[key] = value
+				_buy := buy * 0.006
+				_sell := sell * 0.006
+				timestamp := tsTime.CurrSe()
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":"bithumb", "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
+
+				publish <- newEvent(models.EVENT_MESSAGE, 0, data)
+			}
+			time.Sleep(1 * time.Second)
+
+		}
 	}
 
-	switch tech {
-	case "longpolling":
-		this.Redirect("/lp?uname="+uname, 302)
-	case "websocket":
-		this.Redirect("/ws?uname="+uname, 302)
-	default:
-		this.Redirect("/", 302)
-	}
-
-	// Usually put return after redirect.
-	return
 }
+
 func (this *IndexController) Send() {
 
-	go func() {
-		obj := models.Huobi{}
-		count := 0
-		for {
-			count++
-			buy, sell := obj.Depth("xrpusdt", 10)
-			uname := "Huobi:" + fmt.Sprintf("请求次数：%d", count)
-			data := fmt.Sprintf("当前买入:%f;当前卖出：%f", buy, sell)
-			beego.Info("user:", uname, "content:", data)
-			publish <- newEvent(models.EVENT_MESSAGE, uname, data)
-		}
-	}()
+	db := tsDb.NewDbBase()
+	oSymbol := models.Symbol{}
+	symbol_list, _ := db.DbList(&oSymbol)
 
-	go func() {
-		obj := models.Bithumb{}
-		count := 0
-		for {
-			count++
-			buy, sell := obj.Depth("XRP", 10)
-			uname := "Bithumb:" + fmt.Sprintf("请求次数：%d", count)
-			data := fmt.Sprintf("当前买入:%f;当前卖出：%f", buy, sell)
-			beego.Info("user:", uname, "content:", data)
-			publish <- newEvent(models.EVENT_MESSAGE, uname, data)
-		}
-	}()
+	for _, v := range symbol_list {
+		go GetDepth("huobi", v["Symbol"].(string))
+		go GetDepth("bithumb", v["Symbol"].(string))
+	}
 
 	this.Ctx.WriteString("44444444")
 }

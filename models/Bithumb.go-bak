@@ -1,0 +1,165 @@
+package models
+
+import (
+	"bytes"
+	"crypto/hmac"
+	"crypto/sha512"
+	"encoding/hex"
+	"fmt"
+	"github.com/astaxie/beego"
+	_ "github.com/astaxie/beego/httplib"
+	_ "github.com/tidwall/gjson"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	_ "os"
+	"strconv"
+	_ "strings"
+	"time"
+	"tsEngine/tsCrypto"
+)
+
+//韩国交易平台api接口
+type Bithumb struct {
+}
+
+const (
+	BT_HOST        = "https://api.bithumb.com"
+	BT_CONTENTTYPE = "application/x-www-form-urlencoded"
+)
+
+func (this *Bithumb) Trade() string {
+
+	return ""
+}
+
+//行情数据 {currency} = BTC, ETH, DASH, LTC, ETC, XRP, BCH, XMR, ZEC, QTUM, BTG, EOS (基本值: BTC), ALL(全部
+func (this *Bithumb) Depth() string {
+
+	path := "/public/orderbook/"
+	params := "group_orders=1&count=1"
+	//post_key := []string{"group_orders", "count"}
+	//post_value := []string{"1", "1"}
+
+	content, _ := this.request(path, params)
+
+	return content
+}
+
+//获取账户信息
+func (this *Bithumb) GetAccounts() string {
+	return ""
+
+}
+
+//获取资产
+func (this *Bithumb) GetBalance() string {
+
+	return ""
+
+}
+
+//创建订单
+func (this *Bithumb) CreateOrder(amount, source, symbol, _type, price string) string {
+
+	return ""
+
+}
+
+//取消订单
+func (this *Bithumb) CancelOrder(order_id string) string {
+
+	return ""
+}
+
+//订单信息
+func (this *Bithumb) OrderInfo(order_id string) string {
+	return ""
+}
+
+//虚拟币提现
+func (this *Bithumb) GetWithdraw(address_id, amount, currency, fee, addr_tag string) string {
+	return ""
+}
+
+//取消提现
+func (this *Bithumb) CancelWithdraw(address_id string) string {
+
+	return ""
+
+}
+
+//签名计算
+func (this *Bithumb) createSign(hmac_data string) string {
+
+	hmh := hmac.New(sha512.New, []byte(beego.AppConfig.String("HuobiSecretKey")))
+	hmh.Write([]byte(hmac_data))
+
+	hex_data := hex.EncodeToString(hmh.Sum(nil))
+
+	hmh.Reset()
+
+	sign := tsCrypto.Base64Encode(hex_data)
+
+	return sign
+
+}
+
+//网络请求
+func (this *Bithumb) request(path string, params string) (string, error) {
+
+	params += "&endpoint=" + url.QueryEscape(path)
+
+	nonce_int64 := microsectime()
+	api_nonce := fmt.Sprint(nonce_int64)
+
+	// Api-Sign information generation.
+	hmac_data := path + string(0) + params + string(0) + api_nonce
+	api_sign := this.createSign(hmac_data)
+
+	// Connects to Bithumb API server and returns JSON result value.
+	client := &http.Client{}
+	http_req, _ := http.NewRequest("POST", BT_HOST+path, bytes.NewBufferString(params)) // URL-encoded payload
+
+	http_req.Header.Add("Api-Key", beego.AppConfig.String("BithumbAccessKey"))
+	http_req.Header.Add("pi-Sign", api_sign)
+	http_req.Header.Add("Api-Nonce", api_nonce)
+	http_req.Header.Add("Content-Type", BT_CONTENTTYPE)
+
+	content_length_str := strconv.Itoa(len(params))
+	http_req.Header.Add("Content-Length", content_length_str)
+
+	resp, err := client.Do(http_req)
+	if err != nil {
+		return "", err
+	}
+
+	content, err := ioutil.ReadAll(resp.Body)
+
+	/*
+		beego.Trace(BT_HOST + path)
+		curl := httplib.Post(BT_HOST + path)
+		curl.Header("Api-Key", beego.AppConfig.String("BithumbAccessKey"))
+		curl.Header("pi-Sign", api_sign)
+		curl.Header("Api-Nonce", api_nonce)
+		curl.Header("Content-Type", BT_CONTENTTYPE)
+
+		for k, v := range key {
+			curl.Param(v, value[k])
+		}
+
+		//设置超时时间 2秒链接，3秒读数据
+		curl.SetTimeout(3*time.Second, 3*time.Second)
+
+		//获取请求的内容
+		content, err := curl.Bytes()
+		if err != nil {
+			return "", err
+		}
+	*/
+	return string(content), err
+}
+
+func microsectime() int64 {
+	return time.Now().UnixNano() / int64(time.Millisecond)
+}

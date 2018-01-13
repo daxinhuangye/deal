@@ -3,10 +3,10 @@ package controllers
 import (
 	"Deal/models"
 	"container/list"
-	"time"
-
+	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/gorilla/websocket"
+	"time"
 )
 
 type Subscription struct {
@@ -14,30 +14,30 @@ type Subscription struct {
 	New     <-chan models.Event // New events coming in.
 }
 
-func newEvent(ep models.EventType, user, msg string) models.Event {
+func newEvent(ep models.EventType, user int64, msg string) models.Event {
 	return models.Event{ep, user, int(time.Now().Unix()), msg}
 }
 
-func Join(user string, ws *websocket.Conn) {
+func Join(user int64, ws *websocket.Conn) {
 	subscribe <- Subscriber{Name: user, Conn: ws}
 }
 
-func Leave(user string) {
+func Leave(user int64) {
 	unsubscribe <- user
 }
 
 type Subscriber struct {
-	Name string
+	Name int64
 	Conn *websocket.Conn // Only for WebSocket users; otherwise nil.
 }
 
 var (
 	// Channel for new join users.
-	subscribe = make(chan Subscriber, 10)
+	subscribe = make(chan Subscriber, 100)
 	// Channel for exit users.
-	unsubscribe = make(chan string, 10)
+	unsubscribe = make(chan int64, 100)
 	// Send events here to publish them.
-	publish = make(chan models.Event, 10)
+	publish = make(chan models.Event, 100)
 	// Long polling waiting list.
 	waitingList = list.New()
 	subscribers = list.New()
@@ -91,11 +91,31 @@ func init() {
 	go chatroom()
 }
 
-func isUserExist(subscribers *list.List, user string) bool {
+func isUserExist(subscribers *list.List, user int64) bool {
 	for sub := subscribers.Front(); sub != nil; sub = sub.Next() {
 		if sub.Value.(Subscriber).Name == user {
 			return true
 		}
 	}
 	return false
+}
+
+// broadcastWebSocket broadcasts messages to WebSocket users.
+func broadcastWebSocket(event models.Event) {
+	data, err := json.Marshal(event)
+	if err != nil {
+		beego.Error("Fail to marshal event:", err)
+		return
+	}
+
+	for sub := subscribers.Front(); sub != nil; sub = sub.Next() {
+		// Immediately send event to WebSocket users.
+		ws := sub.Value.(Subscriber).Conn
+		if ws != nil {
+			if ws.WriteMessage(websocket.TextMessage, data) != nil {
+				// User disconnected.
+				unsubscribe <- sub.Value.(Subscriber).Name
+			}
+		}
+	}
 }
