@@ -38,7 +38,7 @@ app.service('WebsocketService', ['$rootScope','LoginService', function($rootScop
 
 	function connectServer(){
 
-	 	ws = new WebSocket("ws://127.0.0.1/join?token=" + LoginService.data.Token);
+	 	ws = new WebSocket("ws://192.168.0.179/join?token=" + LoginService.data.Token);
 	 	ws.onopen = function(){
 			//通知roomCtrl，可以进行登录 
 			conn = true;

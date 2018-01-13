@@ -1,101 +1,162 @@
-<!-- Page Header Start -->
-<div class="pageheader">
-    <h2><i class="fa fa-line-chart"></i> 价格监控 </h2>
 
-    <div class="breadcrumb-wrapper hidden-xs"><span class="label">当前位置:</span>
-        <ol class="breadcrumb">
-            <li><a href="#"> Home </a></li>
 
-        </ol>
-    </div>
-</div>
-<!-- Page Header End -->
-
-<!-- Flot Chart Body Start -->
 <div class="page">
     <div class="row">
-        <div class="col-md-9 pad-5">
+        <div class="col-md-8 pad-5">
 
-                <div class="col-md-4 pad-5 " ng-repeat="(key, symbol) in depth ">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">{{key}}价格</h3>
-                        </div>
-                        <div class="panel-body pad-10">
-                            <table class="table table-striped">
-                                <th>平台</th>
-                                <th>卖盘</th>
-                                <th>买盘</th>
-                                <tr  ng-repeat="item in symbol">
-                                    <td>{{platform[item.platform]}}</td>
-                                    <td>{{item._bids}}</td>
-                                    <td>{{item._asks}}</td>
-                                </tr>
-                                <tr>
-                                    <td>差价：</td>
-                                    <td>{{profit[key].percent | number:2}}%</td>
-                                    <td>{{profit[key].money| number:2}}</td>
-                                </tr>
-                            </table>
-                        </div>
+            <div class="col-md-4 pad-5" ng-repeat="(key, symbol) in depth ">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{key}}价格</h3>
+                    </div>
+                    <div class="panel-body pad-10 ">
+                        <table class="table table-striped" >
+                            <th>平台</th>
+                            <th>卖盘</th>
+                            <th>买盘</th>
+                            <tr ng-repeat="item in symbol">
+                                <td>{{platform[item.platform].name}}</td>
+                                <td>{{item._bids}}</td>
+                                <td>{{item._asks}}</td>
+                            </tr>
+                            <tr>
+                                <td>顺价：</td>
+                                <td>{{profit[key]["surplus"].percent | number:2}}%</td>
+                                <td>{{profit[key]["surplus"].money| number:2}}</td>
+                            </tr>
+                            <tr>
+                                <td>逆差：</td>
+                                <td>{{profit[key]["deficit"].percent | number:2}}%</td>
+                                <td>{{profit[key]["deficit"].money| number:2}}</td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
+            </div>
 
         </div>
 
-        <div class="col-md-3 pad-5">
+        <div class="col-md-4 np mt-10">
 
-                    <div class="panel panel-default mt-5">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">参数设置</h3>
-                        </div>
-                        <div class="panel-body">
+            <div class="panel panel-default mb-5">
+                <div class="panel-heading">
+                    <h3 class="panel-title">可交易的订单</h3>
+                </div>
+                <div class="panel-body pad-10">
+                    <div data-slim-scroll data-scroll-height="216">
+
+                        <table class="table table-striped" style="width:100%">
+                            <th>模式</th>
+                            <th>买价</th>
+                            <th>卖价</th>
+                            <th>数量</th>
+                            <th>赢利</th>
+                            <th>金钱</th>
+                            <tr id="message" ng-repeat="(key, msg) in message" >
+
+                                <td>{{msg.mode}}</td>
+                                <td>{{msg.mode}}</td>
+                                <td>{{msg.mode}}</td>
+                                <td>{{msg.mode}}</td>
+                                <td>{{msg.mode}}</td>
+                                <td>{{msg.mode}}</td>
+
+                            </tr>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default  mb-5">
+                <div class="panel-heading pad-10">
+                    <div class="btn-group pull-right">
+                        <a href="#" class="btn btn-default btn-sm">保存</a>
+                    </div>
+                    <h5>交易参数设置</h5>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" role="form">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label class="col-sm-3 control-label text-danger">利润：</label>
+                                <label class="col-sm-4 control-label">顺差</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" type="input"  ng-model="percent" placeholder="盈利条件："  ng-required = "true">
+                                    <input type="text" class="form-control" ng-model="percent" placeholder="顺差"
+                                           ng-required="true">
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label class="col-sm-3 control-label text-danger">模式：</label>
+                                <label class="col-sm-4 control-label">逆差</label>
                                 <div class="col-sm-8">
-                                    <input class="form-control" type="input"  ng-model="percent" placeholder="先卖后卖："  ng-required = "true">
+                                    <input type="text" class="form-control" ng-model="percent" placeholder="逆差"
+                                           ng-required="true">
                                 </div>
                             </div>
-
                         </div>
-                    </div>
 
 
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">可交易的订单</h3>
-                        </div>
-                        <div class="panel-body pad-10">
-                            <div   data-slim-scroll data-scroll-height="600" >
-
-                                <table class="table table-hover" style="width:100%">
-                                    <tbody >
-
-                                    <tr  id="message" ng-repeat="msg in message track by $index">
-                                        <td class="pad-10 cursor">
-                                            <span class="fa fa-home"></span>
-                                        </td>
-
-
-                                        <td class="pad-10">
-                                            {{msg}}
-                                        </td>
-
-                                    </tr>
-
-                                    </tbody>
-                                </table>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">模式</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control">
+                                        <option value="">买->卖</option>
+                                        <option value="">卖->买</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">交易</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control">
+                                        <option value="">手动</option>
+                                        <option value="">自动</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                    <form>
+                </div>
+            </div>
+
+            <div class="panel panel-default mt-0">
+                <div class="panel-heading pad-10">
+                    <div class="btn-group pull-right">
+                        <a href="#" class="btn btn-default btn-sm">保存</a>
                     </div>
+                    <h5>币种参数设置</h5>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" role="form">
+                        <table class="table table-striped" style="width:100%">
+                            <th>币种</th>
+                            <th>数量</th>
+                            <th>交易费</th>
+                            <th>转账费</th>
+
+                            <tr ng-repeat="(key, item) in settings">
+                                <td> {{key}}</td>
+                                <td><input type="text" class="form-control" ng-model="settings[key].amount" placeholder="数量"
+                                           ng-required="true"></td>
+                                <td><input type="text" class="form-control" ng-model="settings[key].fee" placeholder="转账费"
+                                           ng-required="true"></td>
+                                <td><input type="text" class="form-control" ng-model="settings[key].cost" placeholder="交易费"
+                                           ng-required="true"></td>
 
 
+                            </tr>
+
+                        </table>
+
+                    <form>
+                </div>
+            </div>
 
         </div>
 
