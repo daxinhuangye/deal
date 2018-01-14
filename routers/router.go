@@ -9,7 +9,7 @@ import (
 func init() {
 
 	beego.AutoRouter(&controllers.IndexController{})
-	beego.Router("/join", &controllers.JoinController{})
+	beego.AutoRouter(&controllers.DepthController{})
 
 	/*********************系统路由********************************/
 

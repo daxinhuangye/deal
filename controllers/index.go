@@ -6,10 +6,6 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"reflect"
-	"strings"
-	"time"
-	"tsEngine/tsDb"
-	"tsEngine/tsTime"
 )
 
 type IndexController struct {
@@ -39,67 +35,6 @@ func (this *IndexController) Test() {
 //默认网站首页
 func (this *IndexController) Get() {
 	this.Display("index", false)
-}
-
-func GetDepth(platform string, symbol string) {
-	depth := make(map[string]string)
-	switch platform {
-	case "huobi":
-		obj := models.Huobi{}
-		_symbol := strings.ToLower(symbol) + "usdt"
-		for {
-
-			buy, sell := obj.Depth(_symbol, 0)
-			key := fmt.Sprintf("huobi_%s", symbol)
-			value := fmt.Sprintf("%f_%f", buy, sell)
-			if buy != 0 && sell != 0 && depth[key] != value {
-				depth[key] = value
-				_buy := buy * 7
-				_sell := sell * 7
-				timestamp := tsTime.CurrSe()
-				data := fmt.Sprintf(`{"symbol":"%s", "platform":"huobi", "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
-
-				publish <- newEvent(models.EVENT_MESSAGE, 0, data)
-			}
-
-			time.Sleep(1 * time.Second)
-		}
-
-	case "bithumb":
-		obj := models.Bithumb{}
-		for {
-
-			buy, sell := obj.Depth(symbol, 0)
-			key := fmt.Sprintf("bithumb_%s", symbol)
-			value := fmt.Sprintf("%f_%f", buy, sell)
-			if buy != 0 && sell != 0 && depth[key] != value {
-				depth[key] = value
-				_buy := buy * 0.006
-				_sell := sell * 0.006
-				timestamp := tsTime.CurrSe()
-				data := fmt.Sprintf(`{"symbol":"%s", "platform":"bithumb", "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
-
-				publish <- newEvent(models.EVENT_MESSAGE, 0, data)
-			}
-			time.Sleep(1 * time.Second)
-
-		}
-	}
-
-}
-
-func (this *IndexController) Send() {
-
-	db := tsDb.NewDbBase()
-	oSymbol := models.Symbol{}
-	symbol_list, _ := db.DbList(&oSymbol)
-
-	for _, v := range symbol_list {
-		go GetDepth("huobi", v["Symbol"].(string))
-		go GetDepth("bithumb", v["Symbol"].(string))
-	}
-
-	this.Ctx.WriteString("44444444")
 }
 
 //默认网站首页

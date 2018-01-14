@@ -66,25 +66,39 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 		"EOS":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
 	};
 
+	$scope.select = {
+		"mode":[{"Id":0, "Name":"买卖"}, {"Id":1, "Name":"卖买"}],
+		"order":[{"Id":0, "Name":"手动"}, {"Id":1, "Name":"自动"}],
+	};
 	////fee 币种的数量；cost 交易费：每一单总价的 XXX%；
 	$scope.settings = {
-		"BTC":{"amount":1, "fee":0, "cost":0},
-		"ETH":{"amount":1, "fee":0, "cost":0},
-		"DASH":{"amount":1, "fee":0, "cost":0},
-		"LTC":{"amount":1, "fee":0, "cost":0},
-		"ETC":{"amount":1, "fee":0, "cost":0},
-		"XRP":{"amount":1, "fee":0, "cost":0},
-		"BCH":{"amount":1, "fee":0, "cost":0},
-		"ZEC":{"amount":1, "fee":0, "cost":0},
-		"QTUM":{"amount":1, "fee":0, "cost":0},
-		"EOS":{"amount":1, "fee":0, "cost":0},
+		"surplus" : 25,
+		"deficit" : 25,
+		"mode":0,
+		"order":0,
+		"symbol":{
+			"BTC":{"amount":1, "fee":0, "cost":0, "color":false},
+			"ETH":{"amount":1, "fee":0, "cost":0, "color":false},
+			"DASH":{"amount":1, "fee":0, "cost":0, "color":false},
+			"LTC":{"amount":1, "fee":0, "cost":0, "color":false},
+			"ETC":{"amount":1, "fee":0, "cost":0, "color":false},
+			"XRP":{"amount":1, "fee":0, "cost":0, "color":false},
+			"BCH":{"amount":1, "fee":0, "cost":0, "color":false},
+			"ZEC":{"amount":1, "fee":0, "cost":0, "color":false},
+			"QTUM":{"amount":1, "fee":0, "cost":0, "color":false},
+			"EOS":{"amount":1, "fee":0, "cost":0, "color":false},
+		},
+
+
 	};
 
-	$scope.percent = 25;
 	$scope.message = [];
 	$scope.$on('10000', function(event, data) {
 
 			var obj = angular.fromJson(data);
+			if (obj.bids == $scope.depth[obj.symbol][obj.platform].bids && obj.asks == $scope.depth[obj.symbol][obj.platform].asks ){
+				return
+			}
 			$scope.depth[obj.symbol][obj.platform] = obj;
 
 			var huobi_bids = $scope.depth[obj.symbol]['huobi']['_bids'];
@@ -96,12 +110,18 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 
 
 			if(huobi_bids!=0 && huobi_bids !=0 && bithumb_bids!=0 && bithumb_asks!=0){
+				$scope.settings.symbol[obj.symbol].color = true;
+				$timeout(function(){
+					$scope.settings.symbol[obj.symbol].color = false;
+					return
+				},500);
 				//顺差计算
 				$scope.profit[obj.symbol]["surplus"]['percent'] = ((bithumb_asks - huobi_bids  ) / huobi_bids) * 100;
-				$scope.profit[obj.symbol]["surplus"]['money'] = (bithumb_asks - huobi_bids ) * $scope.amount;
+				$scope.profit[obj.symbol]["surplus"]['money'] = (bithumb_asks - huobi_bids ) * $scope.settings.symbol[obj.symbol].amount;
 				//逆差计算
 				$scope.profit[obj.symbol]["deficit"]['percent'] = ((huobi_asks - bithumb_bids  ) / bithumb_bids) * 100;
-				$scope.profit[obj.symbol]["deficit"]['money'] = (huobi_asks - bithumb_bids ) * $scope.amount;
+				$scope.profit[obj.symbol]["deficit"]['money'] = (huobi_asks - bithumb_bids ) * $scope.settings.symbol[obj.symbol].amount;
+
 				var data = {"mode":"A->B", "buy":huobi_bids, "sell":bithumb_asks, "amount": 0, "percent":0, "money":0 };
 
 				var price = $scope.profit[obj.symbol]["surplus"]['money'];
@@ -118,9 +138,9 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 					data['percent'] = percent;
 
 				}
-				data['money'] =  price * $scope.settings[obj.symbol].amount;
+				data['money'] =  price * $scope.settings.symbol[obj.symbol].amount;
 
-				if (percent >= $scope.percent) {
+				if (percent >= $scope["settings"].surplus) {
 					$scope.message.unshift(data);
 				}
 					

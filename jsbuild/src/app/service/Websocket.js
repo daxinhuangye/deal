@@ -37,18 +37,15 @@ app.service('WebsocketService', ['$rootScope','LoginService', function($rootScop
    
 
 	function connectServer(){
-
-	 	ws = new WebSocket("ws://192.168.0.179/join?token=" + LoginService.data.Token);
+	 	ws = new WebSocket("ws://" + weburl + "/depth/join");
 	 	ws.onopen = function(){
 			//通知roomCtrl，可以进行登录 
 			conn = true;
-
 	    };
 	    
 	    ws.onclose = function () {
 			console.log("连接关闭");
 			conn = false;
-
 		};
 		
 		ws.onerror = function(e) {
@@ -95,37 +92,9 @@ app.service('WebsocketService', ['$rootScope','LoginService', function($rootScop
 		ws.close(1000);
 	}
 
-    //登录服务器
-    Service.loginToken = function(token){
- 		var request = {
-			"Proto":proto.EReqLogin,
-			"Content":angular.toJson({"Token":token	})
-	  	};
-		sendRequest(request);
-    };
-
-    //加入房间
-    Service.joinRoom = function(room_id){
- 		var request = {
-			"Proto":proto.EReqJionRoom,
-			"Content":angular.toJson({"RoomId":room_id})
-	  	};
-		sendRequest(request);
-    };
-
-    //离开房间
-    Service.leaveRoom = function(room_id){
- 		var request = {
-			"Proto":proto.EReqLeaveRoom,
-			"Content":angular.toJson({"RoomId":room_id})
-	  	};
-
-		sendRequest(request);
-    };
 
 	//发送消息
     Service.sendMessage = function(type, tuid, content){
-
 
 		if (angular.isObject(content)) {
 			content = angular.toJson(content);
@@ -139,47 +108,7 @@ app.service('WebsocketService', ['$rootScope','LoginService', function($rootScop
 	  
     };
 
-	//使用道具
-    Service.useItem = function(bid, iid, count, tuid){
-		//console.log("使用道具");
-	  	var request = {
-			"Proto":proto.EReqUseItem,
-			"Content":angular.toJson({"BaseItemId":bid, "ItemId":iid, "Count":count, "ToUserId":tuid})
-	  	};
-	 	sendRequest(request);
-	  
-    };
 
-	//房间列表
-    Service.roomList = function(){
- 		var request = {
-			"Proto":proto.EReqRoomList,
-			"Content":""
-	  	};
-
-		sendRequest(request);
-    };
-
-
-	//房间用户
-    Service.roomUserList = function(){
- 		var request = {
-			"Proto":proto.EReqRoomUserList,
-			"Content":""
-	  	};
-
-		sendRequest(request);
-    };
-
-	//房间用户
-    Service.friendState = function(){
- 		var request = {
-			"Proto":proto.EReqFriendList,
-			"Content":""
-	  	};
-
-		sendRequest(request);
-    };
 
 	//返回对象
     return Service;
