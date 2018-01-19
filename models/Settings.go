@@ -20,5 +20,5 @@ func init() {
 }
 
 func (this *Settings) TableName() string {
-	return "base_settings"
+	return "data_settings"
 }

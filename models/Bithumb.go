@@ -32,7 +32,7 @@ func (this *Bithumb) Depth(symbol string, num float64) (float64, float64) {
 	path := fmt.Sprintf("/public/orderbook/%s?group_orders=%d&count=%d", symbol, 1, 20)
 
 	content := this.publicRequest(path)
-	beego.Trace("韩国行情：", content)
+	//beego.Trace("韩国行情：", content)
 	if content == "" {
 		return 0, 0
 	}
@@ -77,7 +77,7 @@ func (this *Bithumb) GetAccounts() string {
 	key := []string{"order_currency", "payment_currency"}
 	value := []string{"BTC", "KRW"}
 	content := this.privateRequest(path, key, value)
-	beego.Trace(content)
+	//beego.Trace(content)
 	if content == "" {
 		return ""
 	}
@@ -97,7 +97,7 @@ func (this *Bithumb) GetBalance() string {
 	if content == "" {
 		return ""
 	}
-	beego.Trace(content)
+	//beego.Trace(content)
 	krw := gjson.Get(content, "data.total_krw").String()
 	return krw
 
@@ -280,7 +280,7 @@ func (this *Bithumb) privateRequest(path string, key, value []string) string {
 	if status != "0000" {
 		err_msg := gjson.Get(content, "message").String()
 		beego.Error(err_msg)
-		beego.Trace(content)
+		//beego.Trace(content)
 		return ""
 	}
 

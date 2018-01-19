@@ -2,14 +2,16 @@ package controllers
 
 import (
 	"Deal/models"
+	"Deal/service"
 	"fmt"
-	"github.com/astaxie/beego"
-	"github.com/gorilla/websocket"
 	"net/http"
 	"strings"
 	"time"
 	"tsEngine/tsDb"
 	"tsEngine/tsTime"
+
+	"github.com/astaxie/beego"
+	"github.com/gorilla/websocket"
 )
 
 // WebSocketController handles WebSocket requests.
@@ -23,8 +25,30 @@ func (this *DepthController) Prepare() {
 	this.CheckLogin()
 }
 
-func (this *DepthController) Send() {
+//开启实时行情
+func (this *DepthController) Start() {
 
+	//state := service.GetDepthState()
+	//beego.Trace(state)
+	//this.Ctx.WriteString("44444444")
+	db := tsDb.NewDbBase()
+	oSymbol := models.Symbol{}
+	symbol_list, _ := db.DbList(&oSymbol)
+
+	for _, v := range symbol_list {
+		go GetDepth("huobi", v["Symbol"].(string))
+		go GetDepth("bithumb", v["Symbol"].(string))
+	}
+
+	this.Ctx.WriteString("44444444")
+}
+
+//关闭实时行情
+func (this *DepthController) End() {
+
+	state := service.GetDepthState()
+	beego.Trace(state)
+	this.Ctx.WriteString("44444444")
 	db := tsDb.NewDbBase()
 	oSymbol := models.Symbol{}
 	symbol_list, _ := db.DbList(&oSymbol)
@@ -55,18 +79,19 @@ func (this *DepthController) Join() {
 		return
 	}
 
-	// Join chat room.
-	Join(this.AdminId, ws)
-	defer Leave(this.AdminId)
+	//加入房间
+	service.Join(this.AdminId, ws)
+	//释放函数时离开房间
+	defer service.Leave(this.AdminId)
 
-	// Message receive loop.
+	//等待接受用户的消息
 	for {
 		_, p, err := ws.ReadMessage()
 		if err != nil {
 			return
 		}
 		beego.Info("uid:", this.AdminId, "content:", string(p))
-		publish <- newEvent(models.EVENT_MESSAGE, this.AdminId, string(p))
+		service.Publish(this.AdminId, string(p))
 	}
 	return
 }
@@ -78,7 +103,9 @@ func GetDepth(platform string, symbol string) {
 		obj := models.Huobi{}
 		_symbol := strings.ToLower(symbol) + "usdt"
 		for {
-
+			if !service.GetDepthState() {
+				return
+			}
 			buy, sell := obj.Depth(_symbol, 0)
 			key := fmt.Sprintf("huobi_%s", symbol)
 			value := fmt.Sprintf("%f_%f", buy, sell)
@@ -89,7 +116,7 @@ func GetDepth(platform string, symbol string) {
 				timestamp := tsTime.CurrSe()
 				data := fmt.Sprintf(`{"symbol":"%s", "platform":"huobi", "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
 
-				publish <- newEvent(models.EVENT_MESSAGE, 0, data)
+				service.Publish(0, data)
 			}
 
 			time.Sleep(1 * time.Second)
@@ -98,7 +125,9 @@ func GetDepth(platform string, symbol string) {
 	case "bithumb":
 		obj := models.Bithumb{}
 		for {
-
+			if !service.GetDepthState() {
+				return
+			}
 			buy, sell := obj.Depth(symbol, 0)
 			key := fmt.Sprintf("bithumb_%s", symbol)
 			value := fmt.Sprintf("%f_%f", buy, sell)
@@ -108,8 +137,7 @@ func GetDepth(platform string, symbol string) {
 				_sell := sell * 0.006
 				timestamp := tsTime.CurrSe()
 				data := fmt.Sprintf(`{"symbol":"%s", "platform":"bithumb", "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
-
-				publish <- newEvent(models.EVENT_MESSAGE, 0, data)
+				service.Publish(0, data)
 			}
 			time.Sleep(1 * time.Second)
 

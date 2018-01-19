@@ -38,9 +38,9 @@ const (
 func (this *Huobi) Depth(symbol string, num float64) (float64, float64) {
 
 	api := "https://" + HB_HOST + "/market/depth?type=step5&symbol=" + symbol
-	beego.Trace("huobiApi:", api)
+	//beego.Trace("huobiApi:", api)
 	content := this.request(api)
-	beego.Trace("返回值：", content)
+	//beego.Trace("返回值：", content)
 	if content == "" {
 		return 0, 0
 	}
@@ -199,7 +199,7 @@ func (this *Huobi) OrderInfo(order_id string) string {
 	api := "https://" + HB_HOST + path + "?" + this.createSign("GET", path, params)
 
 	content := this.request(api)
-	beego.Trace("订单信息", content)
+	//beego.Trace("订单信息", content)
 	if content == "" {
 		return ""
 	}
@@ -292,8 +292,8 @@ func (this *Huobi) request(api string, fields ...interface{}) string {
 	content := string(temp)
 	status := gjson.Get(content, "status").String()
 	if status != "ok" {
-		beego.Trace(content)
-		beego.Trace(api)
+		//beego.Trace(content)
+		//beego.Trace(api)
 		err_msg := gjson.Get(content, "err-msg").String()
 		beego.Error(err_msg)
 		return ""

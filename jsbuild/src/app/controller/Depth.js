@@ -92,7 +92,17 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 
 	};
 
+	$scope.transactionList = [];
+	$scope.addTransaction = function( index ){
+		var data = $scope.message[index];
+		data.state = 1;
+		$scope.transactionList.unshift(data);
+		
+	};
+	
+	
 	$scope.message = [];
+
 	$scope.$on('10000', function(event, data) {
 
 			var obj = angular.fromJson(data);
@@ -122,25 +132,30 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 				$scope.profit[obj.symbol]["deficit"]['percent'] = ((huobi_asks - bithumb_bids  ) / bithumb_bids) * 100;
 				$scope.profit[obj.symbol]["deficit"]['money'] = (huobi_asks - bithumb_bids ) * $scope.settings.symbol[obj.symbol].amount;
 
-				var data = {"mode":"A->B", "buy":huobi_bids, "sell":bithumb_asks, "amount": 0, "percent":0, "money":0 };
+				var data = {
+					"mode":"买->卖", 
+					"buy":huobi_bids, 
+					"sell":bithumb_asks, 
+					"amount": $scope.settings.symbol[obj.symbol].amount, 
+					"percent":$scope.profit[obj.symbol]["surplus"]['percent'], 
+					"money":$scope.profit[obj.symbol]["surplus"]['money'] 
+				};
 
-				var price = $scope.profit[obj.symbol]["surplus"]['money'];
-				var percent = $scope.profit[obj.symbol]["surplus"]['percent'];
-
+				
 				if ($scope.profit[obj.symbol]["surplus"]['percent'] < $scope.profit[obj.symbol]["deficit"]['percent']) {
 
-
-					price = $scope.profit[obj.symbol]["deficit"]['money'];
-					percent = $scope.profit[obj.symbol]["deficit"]['percent'];
 					data['mode'] = "B->A";
 					data['buy'] = bithumb_bids;
 					data['sell'] = huobi_asks;
-					data['percent'] = percent;
+					data['buy'] = bithumb_bids;
+					data['amount'] = bithumb_bids;
+					data['percent'] = $scope.profit[obj.symbol]["deficit"]['percent'];
+					data['money'] = $scope.profit[obj.symbol]["deficit"]['money'];
 
 				}
-				data['money'] =  price * $scope.settings.symbol[obj.symbol].amount;
+				
 
-				if (percent >= $scope["settings"].surplus) {
+				if (data['percent'] >= $scope["settings"].surplus) {
 					$scope.message.unshift(data);
 				}
 					

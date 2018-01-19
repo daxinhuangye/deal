@@ -20,7 +20,7 @@
                                 <td>{{item._asks}}</td>
                             </tr>
                             <tr ng-class="{'text-danger':profit[key]['surplus'].percent >= percent}">
-                                <td >顺价：</td>
+                                <td >顺差：</td>
                                 <td >{{profit[key]["surplus"].percent | number:2}}%</td>
                                 <td >{{profit[key]["surplus"].money| number:2}}</td>
                             </tr>
@@ -39,11 +39,14 @@
         <div class="col-md-4 np mt-10">
 
             <div class="panel panel-default mb-5">
-                <div class="panel-heading">
-                    <h3 class="panel-title">可交易的订单</h3>
+                <div class="panel-heading pad-10">
+					<div class="btn-group pull-right">
+                        <a ng-click="message=[];" class="btn btn-default btn-sm">清空</a>
+                    </div>
+                    <h6>可交易的订单</h6>
                 </div>
                 <div class="panel-body pad-10">
-                    <div data-slim-scroll data-scroll-height="216">
+                    <div data-slim-scroll data-scroll-height="213">
 
                         <table class="table table-striped" style="width:100%">
                             <th>模式</th>
@@ -52,22 +55,59 @@
                             <th>数量</th>
                             <th>赢利</th>
                             <th>金钱</th>
+							<th>操作</th>
                             <tr id="message" ng-repeat="(key, msg) in message" >
 
                                 <td>{{msg.mode}}</td>
-                                <td>{{msg.mode}}</td>
-                                <td>{{msg.mode}}</td>
-                                <td>{{msg.mode}}</td>
-                                <td>{{msg.mode}}</td>
-                                <td>{{msg.mode}}</td>
-
+                                <td>{{msg.buy| number:2}}</td>
+                                <td>{{msg.sell| number:2}}</td>
+                                <td>{{msg.amount}}</td>
+                                <td>{{msg.percent| number:2}}%</td>
+                                <td>{{msg.money| number:2}}</td>
+								<td><a ng-click="addTransaction(key);" class="btn btn-default btn-sm">交易</a></td>
                             </tr>
 
                         </table>
                     </div>
                 </div>
             </div>
+			
+ 			<div class="panel panel-default mb-5">
+                <div class="panel-heading pad-10">
+					<div class="btn-group pull-right">
+                        <a href="#" class="btn btn-default btn-sm">清空</a>
+                    </div>
+                    <h6>交易中订单</h6>
+                </div>
+                <div class="panel-body pad-10">
+                    <div data-slim-scroll data-scroll-height="100">
 
+                        <table class="table table-striped" style="width:100%">
+                            <th>模式</th>
+                            <th>买价</th>
+                            <th>卖价</th>
+                            <th>数量</th>
+                            <th>赢利</th>
+                            <th>金钱</th>
+							<th>状态</th>
+                            <tr  ng-repeat="(key, item) in transactionList" >
+
+                                <td>{{item.mode}}</td>
+                                <td>{{item.buy| number:2}}</td>
+                                <td>{{item.sell| number:2}}</td>
+                                <td>{{item.amount}}</td>
+                                <td>{{item.percent| number:2}}%</td>
+                                <td>{{item.money| number:2}}</td>
+								<td ng-if="item.state==1">交易中</td>
+								<td ng-if="item.state==2">交易中</td>
+								<td ng-if="item.state==3">交易中</td>
+                            </tr>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+			
             <div class="panel panel-default  mb-5">
                 <div class="panel-heading pad-10">
                     <div class="btn-group pull-right">
@@ -144,11 +184,11 @@
 
                             <tr ng-repeat="(key, item) in settings.symbol">
                                 <td> {{key}}</td>
-                                <td><input type="text" class="form-control" ng-model="settings[key].amount" placeholder="数量"
+                                <td><input type="text" class="form-control" ng-model="settings.symbol[key].amount" placeholder="数量"
                                            ng-required="true"></td>
-                                <td><input type="text" class="form-control" ng-model="settings[key].cost" placeholder="交易费"
+                                <td><input type="text" class="form-control" ng-model="settings.symbol[key].cost" placeholder="交易费"
                                            ng-required="true"></td>
-                                <td><input type="text" class="form-control" ng-model="settings[key].fee" placeholder="转账费"
+                                <td><input type="text" class="form-control" ng-model="settings.symbol[key].fee" placeholder="转账费"
                                            ng-required="true"></td>
 
 
