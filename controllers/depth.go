@@ -97,7 +97,7 @@ func (this *DepthController) Join() {
 }
 
 func GetDepth(platform string, symbol string) {
-	depth := make(map[string]string)
+	//depth := make(map[string]string)
 	switch platform {
 	case "huobi":
 		obj := models.Huobi{}
@@ -107,10 +107,11 @@ func GetDepth(platform string, symbol string) {
 				return
 			}
 			buy, sell := obj.Depth(_symbol, 0)
-			key := fmt.Sprintf("huobi_%s", symbol)
-			value := fmt.Sprintf("%f_%f", buy, sell)
-			if buy != 0 && sell != 0 && depth[key] != value {
-				depth[key] = value
+			//key := fmt.Sprintf("huobi_%s", symbol)
+			//value := fmt.Sprintf("%f_%f", buy, sell)
+			//if buy != 0 && sell != 0 && depth[key] != value {
+			if buy != 0 && sell != 0 {
+				//depth[key] = value
 				_buy := buy * 7
 				_sell := sell * 7
 				timestamp := tsTime.CurrSe()
@@ -129,10 +130,11 @@ func GetDepth(platform string, symbol string) {
 				return
 			}
 			buy, sell := obj.Depth(symbol, 0)
-			key := fmt.Sprintf("bithumb_%s", symbol)
-			value := fmt.Sprintf("%f_%f", buy, sell)
-			if buy != 0 && sell != 0 && depth[key] != value {
-				depth[key] = value
+			//key := fmt.Sprintf("bithumb_%s", symbol)
+			//value := fmt.Sprintf("%f_%f", buy, sell)
+			//if buy != 0 && sell != 0 && depth[key] != value {
+			if buy != 0 && sell != 0 {
+				//depth[key] = value
 				_buy := buy * 0.006
 				_sell := sell * 0.006
 				timestamp := tsTime.CurrSe()

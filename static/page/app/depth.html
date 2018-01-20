@@ -3,33 +3,34 @@
 <div class="page text-warning ">
     <div class="row">
         <div class="col-md-8 pad-5">
-
-            <div class="col-md-4 pad-5" ng-repeat="(key, symbol) in depth ">
-                <div class="panel panel-default "  ng-class=" {'market-buy': settings.symbol[key].color} " >
-                    <div class="panel-heading">
-                        <h3 class="panel-title">{{key}}价格</h3>
-                    </div>
-                    <div class="panel-body pad-10 ">
-                        <table class="table table-striped">
-                            <th>平台</th>
-                            <th>卖盘</th>
-                            <th>买盘</th>
-                            <tr ng-repeat="item in symbol">
-                                <td>{{platform[item.platform].name}}</td>
-                                <td>{{item._bids}}</td>
-                                <td>{{item._asks}}</td>
-                            </tr>
-                            <tr ng-class="{'text-danger':profit[key]['surplus'].percent >= percent}">
-                                <td >顺差：</td>
-                                <td >{{profit[key]["surplus"].percent | number:2}}%</td>
-                                <td >{{profit[key]["surplus"].money| number:2}}</td>
-                            </tr>
-                            <tr ng-class="{'text-danger':profit[key]['deficit'].percent >= percent}">
-                                <td>逆差：</td>
-                                <td>{{profit[key]["deficit"].percent | number:2}}%</td>
-                                <td>{{profit[key]["deficit"].money| number:2}}</td>
-                            </tr>
-                        </table>
+            <div ng-repeat="(key, symbol) in depth ">
+                <div class="col-md-4 pad-5" ng-if="settings.symbol[key].amount>0">
+                    <div class="panel panel-default "  ng-class=" {'market-buy': settings.symbol[key].color} " >
+                        <div class="panel-heading">
+                            <h3 class="panel-title">{{key}}价格</h3>
+                        </div>
+                        <div class="panel-body pad-10 ">
+                            <table class="table table-striped">
+                                <th>平台</th>
+                                <th>卖盘</th>
+                                <th>买盘</th>
+                                <tr ng-repeat="item in symbol">
+                                    <td>{{platform[item.platform].name}}</td>
+                                    <td>{{item._bids}}</td>
+                                    <td>{{item._asks}}</td>
+                                </tr>
+                                <tr ng-class="{'text-danger':profit[key]['surplus'].percent >= percent}">
+                                    <td >顺差：</td>
+                                    <td >{{profit[key]["surplus"].percent | number:2}}%</td>
+                                    <td >{{profit[key]["surplus"].money| number:2}}</td>
+                                </tr>
+                                <tr ng-class="{'text-danger':profit[key]['deficit'].percent >= percent}">
+                                    <td>逆差：</td>
+                                    <td>{{profit[key]["deficit"].percent | number:2}}%</td>
+                                    <td>{{profit[key]["deficit"].money| number:2}}</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -49,18 +50,14 @@
                     <div data-slim-scroll data-scroll-height="213">
 
                         <table class="table table-striped" style="width:100%">
-                            <th>模式</th>
-                            <th>买价</th>
-                            <th>卖价</th>
+                            <th>币种</th>
                             <th>数量</th>
-                            <th>赢利</th>
-                            <th>金钱</th>
+                            <th>赢利比</th>
+                            <th>盈利额</th>
 							<th>操作</th>
                             <tr id="message" ng-repeat="(key, msg) in message" >
 
-                                <td>{{msg.mode}}</td>
-                                <td>{{msg.buy| number:2}}</td>
-                                <td>{{msg.sell| number:2}}</td>
+                                <td>{{msg.symbol}}</td>
                                 <td>{{msg.amount}}</td>
                                 <td>{{msg.percent| number:2}}%</td>
                                 <td>{{msg.money| number:2}}</td>
@@ -121,8 +118,14 @@
                             <div class="form-group">
                                 <label class="col-sm-4 control-label">顺差</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" ng-model="settings.surplus" placeholder="顺差"
-                                           ng-required="true">
+
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" ng-model="settings.surplus" placeholder="顺差"
+                                               ng-required="true">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+
+
                                 </div>
                             </div>
                         </div>
@@ -130,8 +133,11 @@
                             <div class="form-group">
                                 <label class="col-sm-4 control-label">逆差</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" ng-model="settings.deficit" placeholder="逆差"
-                                           ng-required="true">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" ng-model="settings.deficit" placeholder="逆差"
+                                               ng-required="true">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -163,6 +169,8 @@
                             </div>
                         </div>
 
+
+
                     <form>
                 </div>
             </div>
@@ -179,18 +187,26 @@
                         <table class="table table-striped" style="width:100%">
                             <th>币种</th>
                             <th>数量</th>
-                            <th>交易费</th>
-                            <th>转账费</th>
-
+                            <th>H交易费</th>
+                            <th>H转账费</th>
+                            <th>B交易费</th>
+                            <th>B转账费</th>
                             <tr ng-repeat="(key, item) in settings.symbol">
                                 <td> {{key}}</td>
-                                <td><input type="text" class="form-control" ng-model="settings.symbol[key].amount" placeholder="数量"
-                                           ng-required="true"></td>
+                                <td> <input type="text" class="form-control" ng-model="settings.symbol[key].amount" placeholder="数量"
+                                               ng-required="true">
+                                </td>
                                 <td><input type="text" class="form-control" ng-model="settings.symbol[key].cost" placeholder="交易费"
-                                           ng-required="true"></td>
+                                           ng-required="true">
+                                </td>
                                 <td><input type="text" class="form-control" ng-model="settings.symbol[key].fee" placeholder="转账费"
                                            ng-required="true"></td>
 
+                                <td><input type="text" class="form-control" ng-model="settings.symbol[key].cost" placeholder="交易费"
+                                           ng-required="true">
+                                </td>
+                                <td><input type="text" class="form-control" ng-model="settings.symbol[key].fee" placeholder="转账费"
+                                           ng-required="true"></td>
 
                             </tr>
 

@@ -102,8 +102,8 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 	};
 	////fee 币种的数量；cost 交易费：每一单总价的 XXX%；
 	$scope.settings = {
-		"surplus" : 25,
-		"deficit" : 25,
+		"surplus" : 15,
+		"deficit" : 5,
 		"mode":0,
 		"order":0,
 		"symbol":{
@@ -136,7 +136,8 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 	$scope.$on('10000', function(event, data) {
 
 			var obj = angular.fromJson(data);
-			if (obj.bids == $scope.depth[obj.symbol][obj.platform].bids && obj.asks == $scope.depth[obj.symbol][obj.platform].asks ){
+
+			if ($scope.settings.symbol[obj.symbol].amount<=0 || (obj.bids == $scope.depth[obj.symbol][obj.platform].bids && obj.asks == $scope.depth[obj.symbol][obj.platform].asks) ){
 				return
 			}
 			$scope.depth[obj.symbol][obj.platform] = obj;
@@ -163,7 +164,8 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 				$scope.profit[obj.symbol]["deficit"]['money'] = (huobi_asks - bithumb_bids ) * $scope.settings.symbol[obj.symbol].amount;
 
 				var data = {
-					"mode":"买->卖", 
+					"symbol":obj.symbol,
+					"mode":$scope.settings.mode,
 					"buy":huobi_bids, 
 					"sell":bithumb_asks, 
 					"amount": $scope.settings.symbol[obj.symbol].amount, 

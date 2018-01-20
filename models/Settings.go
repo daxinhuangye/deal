@@ -5,14 +5,11 @@ import (
 )
 
 type Settings struct {
-	Id              int64   // 编号
-	Pid             int64   // 平台Id
-	Sid             int64   // 货币Id
-	Currency        string  // 法币
-	PricePrecision  int64   // 单价精度
-	AmountPrecision int64   // 数量精度
-	DealCost        float64 // 交易费
-	Fee             float64 // 手续费
+	Id     int64  // 编号
+	Uid    int64  // 用户id
+	Base   string // 基础配置
+	Symbol string // 币种配置
+
 }
 
 func init() {
