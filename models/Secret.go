@@ -9,6 +9,7 @@ import (
 type Secret struct {
 	Id        int64
 	Uid       int64
+	Pid       int64
 	AccessKey string
 	SecretKey string
 }
@@ -28,7 +29,7 @@ func (this *Secret) List(page int64, page_size int64, keyword string) (data []or
 	op := orm.NewOrm().QueryTable(this)
 
 	if keyword != "" {
-		cond := orm.NewCondition().And("Ip__icontains", keyword).Or("Description__icontains", keyword)
+		cond := orm.NewCondition().And("AccessKey__icontains", keyword).Or("SecretKey__icontains", keyword)
 		op = op.SetCond(cond)
 	}
 

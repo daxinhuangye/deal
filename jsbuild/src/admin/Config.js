@@ -19,7 +19,7 @@ var app = angular.module("App", [
 
 .constant("appCfg", {
 	"AdminPrefix":"/admin",
-	"AppPrefix":"/app",
+	"AppPrefix":"",
 	"Sex":[{"Id":1,"Name":"男"},{"Id":2,"Name":"女"},{"Id":3,"Name":"保密"}],
 	"Status":[{"Id":1,"Name":"正常"},{"Id":2,"Name":"封杀"}],
 })

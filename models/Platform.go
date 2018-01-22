@@ -8,8 +8,9 @@ import (
 type Platform struct {
 	Id       int64
 	Platform string  //平台
+	Name     string  //名称
 	Rate     float64 //汇率
-	Fee      float64 //手续费
+
 }
 
 func init() {

@@ -5,7 +5,7 @@ app.service('LoginService', ["$rootScope", "$window", "$http", "$location", "md5
 		
 		
 		//登录用户数据结构
-    	data: {Code:0, Admin:{}, Lock:0, Nav:[], Role:"", Token:"123456789"},
+    	data: {Code:0, Admin:{}, Lock:0, Nav:[], Role:""},
 		
 		//用户登录
 		login : function (username, password, remember){

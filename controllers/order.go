@@ -12,7 +12,7 @@ type OrderController struct {
 
 //类似构造函数
 func (this *OrderController) Prepare() {
-
+	this.CheckPermission()
 }
 
 //默认网站首页

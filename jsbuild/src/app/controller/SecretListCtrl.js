@@ -1,6 +1,6 @@
-app.controller("SecretListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "configService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, configService) {
+app.controller("SecretListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService) {
 
-	$scope.config = configService.data;
+	$scope.platform = PlatformService.data;
 
 	//**************************************************************
 	$scope.search = {
@@ -32,7 +32,7 @@ app.controller("SecretListCtrl", ["$scope", "$http", "$filter", "$modal", "EzCon
             controller: "SecretEditCtrl",
             resolve: {
             	curr_data: function () {
-                    return {"Op":"add", "Data":{"Sort":100}};
+                    return {"Op":"add", "Data":{}};
                 }
             }
         }), modalInstance.result.then(function (data) {

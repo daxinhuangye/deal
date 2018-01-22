@@ -15,7 +15,7 @@ type SettingsController struct {
 
 //类似构造函数
 func (this *SettingsController) Prepare() {
-
+	this.CheckPermission()
 }
 
 //屏蔽IP列表

@@ -25,21 +25,6 @@ func (this *DepthController) Prepare() {
 	this.CheckLogin()
 }
 
-//获取资产
-func (this *DepthController) Balance() {
-	//db := tsDb.NewDbBase()
-
-	oHuobi := models.Huobi{}
-	huobi_trade, huobi_frozen := oHuobi.GetBalance()
-
-	oBithumb := models.Bithumb{}
-	bithumb_res := oBithumb.GetBalance()
-
-	this.Code = 1
-	this.Result = map[string]interface{}{"HuobiTrade": huobi_trade, "HuobiFrozen": huobi_frozen, "Bithumb": bithumb_res}
-	this.TraceJson()
-}
-
 //开启实时行情
 func (this *DepthController) Start() {
 
@@ -130,7 +115,7 @@ func GetDepth(platform string, symbol string) {
 				_buy := buy * 7
 				_sell := sell * 7
 				timestamp := tsTime.CurrSe()
-				data := fmt.Sprintf(`{"symbol":"%s", "platform":"huobi", "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":1, "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
 
 				service.Publish(0, data)
 			}
@@ -153,7 +138,7 @@ func GetDepth(platform string, symbol string) {
 				_buy := buy * 0.006
 				_sell := sell * 0.006
 				timestamp := tsTime.CurrSe()
-				data := fmt.Sprintf(`{"symbol":"%s", "platform":"bithumb", "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":2, "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
 				service.Publish(0, data)
 			}
 			time.Sleep(1 * time.Second)

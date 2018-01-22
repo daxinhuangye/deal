@@ -1,54 +1,57 @@
-app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "configService",  "$timeout", "WebsocketService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, configService, $timeout, WebsocketService) {
-	$scope.platform = {"huobi":{"name":"火币网", "rate":7}, "bithumb":{"name":"韩币网", "rate":0.0006}};
+app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService",  "$timeout", "WebsocketService","BalanceService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService, $timeout, WebsocketService, BalanceService) {
+	//资产状态
+	$scope.balance = BalanceService.data;
+	console.log("资产：", $scope.balance);
+	$scope.platform = PlatformService.data;
 	$scope.depth = {
 		"BTC":{
-			"huobi":{"platform":"huobi", "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"bithumb":{"platform":"bithumb","bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 
 		},
 		"ETH":{
-			"huobi":{"platform":"huobi", "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"bithumb":{"platform":"bithumb","bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 
 		},
 		"DASH":{
-			"huobi":{"platform":"huobi", "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"bithumb":{"platform":"bithumb","bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 
 		},
 		"LTC":{
-			"huobi":{"platform":"huobi", "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"bithumb":{"platform":"bithumb","bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 
 		},
 		"ETC":{
-			"huobi":{"platform":"huobi", "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"bithumb":{"platform":"bithumb","bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 
 		},
 		"XRP":{
-			"huobi":{"platform":"huobi", "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"bithumb":{"platform":"bithumb","bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 
 		},
 		"BCH":{
-			"huobi":{"platform":"huobi", "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"bithumb":{"platform":"bithumb","bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 
 		},
 		"ZEC":{
-			"huobi":{"platform":"huobi", "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"bithumb":{"platform":"bithumb","bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 
 		},
 		"QTUM":{
-			"huobi":{"platform":"huobi", "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"bithumb":{"platform":"bithumb","bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 
 		},
 		"EOS":{
-			"huobi":{"platform":"huobi", "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"bithumb":{"platform":"bithumb","bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		}
 
 	};
@@ -106,17 +109,18 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 	$scope.$on('10000', function(event, data) {
 
 			var obj = angular.fromJson(data);
+
 			//如果数量小于等于0 或者 买盘和卖盘都相等的话，直接返回
 			if ($scope.settings.symbol[obj.symbol].amount<=0 || (obj.bids == $scope.depth[obj.symbol][obj.platform].bids && obj.asks == $scope.depth[obj.symbol][obj.platform].asks) ){
 				return
 			}
 			$scope.depth[obj.symbol][obj.platform] = obj;
 
-			var huobi_bids = $scope.depth[obj.symbol]['huobi']['_bids'];
-			var huobi_asks = $scope.depth[obj.symbol]['huobi']['_asks'];
+			var huobi_bids = $scope.depth[obj.symbol]['1']['_bids'];
+			var huobi_asks = $scope.depth[obj.symbol]['1']['_asks'];
 
-			var bithumb_bids = $scope.depth[obj.symbol]['bithumb']['_bids'];
-			var bithumb_asks = $scope.depth[obj.symbol]['bithumb']['_asks'];
+			var bithumb_bids = $scope.depth[obj.symbol]['2']['_bids'];
+			var bithumb_asks = $scope.depth[obj.symbol]['2']['_asks'];
 
 
 

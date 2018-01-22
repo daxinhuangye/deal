@@ -1,12 +1,12 @@
-app.service('typeService', ["$rootScope", "$http", "$filter", "appCfg", function($rootScope, $http, $filter,  appCfg) {
+app.service('PlatformService', ["$rootScope", "$http", "$filter", "appCfg", function($rootScope, $http, $filter, appCfg) {
 	var self = this;
-	
+
 	this.data = {
-			"Items":[]
+		"Items":[]
 	};
 	
-	this.getList = function() {
-		var url = appCfg.AppPrefix + "/apppub/type";
+	this.getData = function() {
+		var url = appCfg.AppPrefix + "/apppub/platform";
 		
 		$http.get(url).success(function(data, status, headers, config) {
 			if($filter("CheckError")(data)){
@@ -18,6 +18,6 @@ app.service('typeService', ["$rootScope", "$http", "$filter", "appCfg", function
 		});
 	};
 	
-	this.getList();
+	this.getData();
 }]);
 

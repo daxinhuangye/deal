@@ -10,6 +10,11 @@ func init() {
 
 	beego.AutoRouter(&controllers.IndexController{})
 	beego.AutoRouter(&controllers.DepthController{})
+	beego.AutoRouter(&controllers.SettingsController{})
+	beego.AutoRouter(&controllers.SecretController{})
+	beego.AutoRouter(&controllers.OrderController{})
+	beego.AutoRouter(&controllers.ApiController{})
+	beego.AutoRouter(&controllers.ApppubController{})
 
 	/*********************系统路由********************************/
 

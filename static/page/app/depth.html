@@ -13,7 +13,7 @@
                                 <th>卖盘</th>
                                 <th>买盘</th>
                                 <tr ng-repeat="item in symbol">
-                                    <td>{{platform[item.platform].name}}</td>
+                                    <td>{{item.platform|arrayAttr:platform.Items:'Name'}}</td>
                                     <td>{{item._bids}}</td>
                                     <td>{{item._asks}}</td>
                                 </tr>

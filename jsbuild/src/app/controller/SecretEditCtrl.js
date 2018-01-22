@@ -1,4 +1,4 @@
-app.controller("SecretEditCtrl", ["$scope", "$http", "$filter", "$modalInstance", "curr_data", "appCfg", function ($scope, $http, $filter, $modalInstance, curr_data, appCfg) {
+app.controller("SecretEditCtrl", ["$scope", "$http", "$filter", "$modalInstance", "curr_data", "appCfg", "PlatformService", function ($scope, $http, $filter, $modalInstance, curr_data, appCfg, PlatformService) {
 	
 	
     $scope.cancel = function () {
@@ -43,21 +43,21 @@ app.controller("SecretEditCtrl", ["$scope", "$http", "$filter", "$modalInstance"
     };
 	/***********************数据定义*****************************/
 	$scope.attrDef = [
-		{"Key":"Qq", "Title":"QQ账号", "InputType":"text", "Required":"true"},
-		{"Key":"Password", "Title":"QQ密码", "InputType":"text", "Required":"true"},
-		{"Key":"Cookie", "Title":"Cookie", "InputType":"textarea", "Required":"true"},
+		{"Key":"Pid", "Title":"平台类型", "InputType":"select", "Required":"true", "Value":PlatformService.data.Items},
+		{"Key":"AccessKey", "Title":"AccessKey", "InputType":"text", "Required":"true"},
+		{"Key":"SecretKey", "Title":"SecretKey", "InputType":"text", "Required":"true"},
 	];	
 	
 	/***********************初始化*****************************/
-	$scope.title = "添加QQ小号";
+	$scope.title = "添加平台秘钥";
 	$scope.op =  angular.copy(curr_data.Op);
 	$scope.oldData = angular.copy(curr_data.Data);
 	$scope.editData = angular.copy($scope.oldData);
-    $scope.postUrl = appCfg.AppPrefix +"/qq/add";
+    $scope.postUrl = appCfg.AppPrefix +"/secret/add";
 
 	if (curr_data.Op=='edit'){
-		$scope.title= "编辑QQ小号";
-		$scope.postUrl = appCfg.AppPrefix +"/qq/edit";
+		$scope.title= "编辑平台秘钥";
+		$scope.postUrl = appCfg.AppPrefix +"/secret/edit";
 	}
 
 
