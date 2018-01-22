@@ -6,23 +6,14 @@ app.config( ["$routeProvider", function ($routeProvider) {
 		controller: "DepthCtrl"
 	});
 
-	$routeProvider.when('/my/list', {
-		templateUrl: '/static/page/app/my_list.html',
-		controller: "MyListCtrl"
+	$routeProvider.when('/secret/list', {
+		templateUrl: '/static/page/app/secret_list.html',
+		controller: "SecretListCtrl"
 	});
 
-	$routeProvider.when('/files/list', {
-		templateUrl: '/static/page/app/files_list.html',
-		controller: "FilesListCtrl"
+	$routeProvider.when('/order/list', {
+		templateUrl: '/static/page/app/order_list.html',
+		controller: "OrderListCtrl"
 	});
 
-	$routeProvider.when('/domain/list', {
-		templateUrl: '/static/page/app/domain_list.html',
-		controller: "DomainListCtrl"
-	});
-
-	$routeProvider.when('/qq/list', {
-		templateUrl: '/static/page/app/qq_list.html',
-		controller: "QqListCtrl"
-	});
 }]);

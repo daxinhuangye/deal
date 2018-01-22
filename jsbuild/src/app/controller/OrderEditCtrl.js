@@ -1,5 +1,4 @@
-
-app.controller("FilesEditCtrl", ["$sce", "$scope", "$http", "$filter", "$modalInstance", "curr_data", "appCfg", function ($sce, $scope, $http, $filter, $modalInstance, curr_data, appCfg) {
+app.controller("OrderEditCtrl", ["$scope", "$http", "$filter", "$modalInstance", "curr_data", "appCfg", function ($scope, $http, $filter, $modalInstance, curr_data, appCfg) {
 	
 	
     $scope.cancel = function () {
@@ -46,28 +45,19 @@ app.controller("FilesEditCtrl", ["$sce", "$scope", "$http", "$filter", "$modalIn
 	$scope.attrDef = [
 		{"Key":"Domain", "Title":"域名", "InputType":"text", "Required":"true"},
 		{"Key":"Sort", "Title":"排序", "InputType":"text-i", "Required":"true", "Min":1, "Max":100},
-		{"Key":"Note", "Title":"备注", "InputType":"text", "Required":"false"},
+		{"Key":"Note", "Title":"备注", "InputType":"textarea", "Required":"false"},
 	];	
 	
 	/***********************初始化*****************************/
-	$scope.title = "文件上传";
+	$scope.title = "添加域名";
 	$scope.op =  angular.copy(curr_data.Op);
 	$scope.oldData = angular.copy(curr_data.Data);
 	$scope.editData = angular.copy($scope.oldData);
-    $scope.postUrl = appCfg.AppPrefix +"/files/add";
+    $scope.postUrl = appCfg.AppPrefix +"/domain/add";
 
 	if (curr_data.Op=='edit'){
-		$scope.title= "编辑文件";
-		$scope.postUrl = appCfg.AppPrefix +"/files/edit";
-	}
-	if (curr_data.Op=='play'){
-		$scope.title= $scope.oldData.FileName +"--播放测试";
-
-		var url = encodeURI("http://jdyun.com/?vid=" + $scope.oldData.Key);
-		
-		$scope.playUrl = $sce.trustAsResourceUrl("http://123.172.7.3:8200/jx/?url="+url);
-
-
+		$scope.title= "编辑域名";
+		$scope.postUrl = appCfg.AppPrefix +"/domain/edit";
 	}
 
 

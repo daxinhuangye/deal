@@ -1,4 +1,4 @@
-app.controller("QqListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "configService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, configService) {
+app.controller("OrderListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "configService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, configService) {
 
 	$scope.config = configService.data;
 
@@ -13,7 +13,7 @@ app.controller("QqListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm
 
 
 	$scope.getList = function() {
-		var url = appCfg.AppPrefix + "/qq/list";
+		var url = appCfg.AppPrefix + "/domain/list";
 		$http.post(url, $scope.search).success(function(data, status, headers, config) {
 			if($filter("CheckError")(data)){
 				$scope.listData= data.Data;
@@ -29,7 +29,7 @@ app.controller("QqListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm
         modalInstance = $modal.open({
 			backdrop: false,
             templateUrl: "/static/page/modal/base.html",
-            controller: "QqEditCtrl",
+            controller: "DomainEditCtrl",
             resolve: {
             	curr_data: function () {
                     return {"Op":"add", "Data":{"Sort":100}};
@@ -42,13 +42,13 @@ app.controller("QqListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm
 	
 	$scope.edit = function(id) {
 		
-		var url = appCfg.AppPrefix + "/qq/edit/" + id;
+		var url = appCfg.AppPrefix + "/domain/edit/" + id;
 		$http.get(url).success(function(data, status, headers, config) {
 			if($filter("CheckError")(data)){
 				 modalInstance = $modal.open({
 					backdrop: false,
 		            templateUrl: "/static/page/modal/base.html",
-		            controller: "QqEditCtrl",
+		            controller: "DomainEditCtrl",
 		            resolve: {
 		            	curr_data: function () {
 		                    return {"Op":"edit", "Data":data.Data};
@@ -64,12 +64,13 @@ app.controller("QqListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm
 	     
 
 	$scope.del = function(item) {
-		EzConfirm.create({heading: 'QQ小号删除', text: '确定删除“'+item.Qq+'“吗？'}).then(function() {
+		EzConfirm.create({heading: '域名删除', text: '确定删除域名“'+item.Name+'“吗？'}).then(function() {
         	var post = angular.copy(item);  
-			var url = appCfg.AppPrefix + "/qq/del";
+			var url = appCfg.AppPrefix + "/domain/del";
 			$http.post(url, post).success(function(data, status, headers, config) {
 				if($filter("CheckError")(data)){
 					$scope.getList();
+					storeService.getList(); 
 				}
 			});		  	
 		});

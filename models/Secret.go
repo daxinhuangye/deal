@@ -5,29 +5,25 @@ import (
 	"tsEngine/tsPagination"
 )
 
-//订单表模型
-type Order struct {
-	Id      int64
-	OrderId string
-	Pid     float64
-	Amount  string
-	Price   string
-	Symbol  string
-	Type    string
-	Time    string
+//秘钥表模型
+type Secret struct {
+	Id        int64
+	Uid       int64
+	AccessKey string
+	SecretKey string
 }
 
 func init() {
-	orm.RegisterModel(new(Order))
+	orm.RegisterModel(new(Secret))
 }
 
-func (this *Order) TableName() string {
-	return "data_order"
+func (this *Secret) TableName() string {
+	return "data_secret"
 }
 
 /************************************************************/
 
-func (this *Order) List(page int64, page_size int64, keyword string) (data []orm.Params, pagination *tsPagination.Pagination, err error) {
+func (this *Secret) List(page int64, page_size int64, keyword string) (data []orm.Params, pagination *tsPagination.Pagination, err error) {
 
 	op := orm.NewOrm().QueryTable(this)
 
