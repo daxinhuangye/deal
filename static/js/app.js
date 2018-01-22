@@ -107,16 +107,16 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 		"mode":0,
 		"order":0,
 		"symbol":{
-			"BTC":{"amount":1, "fee":0, "cost":0, "color":false},
-			"ETH":{"amount":1, "fee":0, "cost":0, "color":false},
-			"DASH":{"amount":1, "fee":0, "cost":0, "color":false},
-			"LTC":{"amount":1, "fee":0, "cost":0, "color":false},
-			"ETC":{"amount":1, "fee":0, "cost":0, "color":false},
-			"XRP":{"amount":1, "fee":0, "cost":0, "color":false},
-			"BCH":{"amount":1, "fee":0, "cost":0, "color":false},
-			"ZEC":{"amount":1, "fee":0, "cost":0, "color":false},
-			"QTUM":{"amount":1, "fee":0, "cost":0, "color":false},
-			"EOS":{"amount":1, "fee":0, "cost":0, "color":false},
+			"BTC":{"amount":10, "fee":0, "cost":0, "color":false},
+			"ETH":{"amount":10, "fee":0, "cost":0, "color":false},
+			"DASH":{"amount":10, "fee":0, "cost":0, "color":false},
+			"LTC":{"amount":10, "fee":0, "cost":0, "color":false},
+			"ETC":{"amount":10, "fee":0, "cost":0, "color":false},
+			"XRP":{"amount":10, "fee":0, "cost":0, "color":false},
+			"BCH":{"amount":10, "fee":0, "cost":0, "color":false},
+			"ZEC":{"amount":10, "fee":0, "cost":0, "color":false},
+			"QTUM":{"amount":10, "fee":0, "cost":0, "color":false},
+			"EOS":{"amount":10, "fee":0, "cost":0, "color":false},
 		},
 
 
@@ -136,7 +136,7 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 	$scope.$on('10000', function(event, data) {
 
 			var obj = angular.fromJson(data);
-
+			//如果数量小于等于0 或者 买盘和卖盘都相等的话，直接返回
 			if ($scope.settings.symbol[obj.symbol].amount<=0 || (obj.bids == $scope.depth[obj.symbol][obj.platform].bids && obj.asks == $scope.depth[obj.symbol][obj.platform].asks) ){
 				return
 			}
@@ -163,35 +163,30 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 				$scope.profit[obj.symbol]["deficit"]['percent'] = ((huobi_asks - bithumb_bids  ) / bithumb_bids) * 100;
 				$scope.profit[obj.symbol]["deficit"]['money'] = (huobi_asks - bithumb_bids ) * $scope.settings.symbol[obj.symbol].amount;
 
-				var data = {
-					"symbol":obj.symbol,
-					"mode":$scope.settings.mode,
-					"buy":huobi_bids, 
-					"sell":bithumb_asks, 
-					"amount": $scope.settings.symbol[obj.symbol].amount, 
-					"percent":$scope.profit[obj.symbol]["surplus"]['percent'], 
-					"money":$scope.profit[obj.symbol]["surplus"]['money'] 
-				};
+				//如果顺差和逆差都不满足条件直接返回
+                if ($scope.profit[obj.symbol]["surplus"]['percent'] < $scope["settings"].surplus &&  $scope.profit[obj.symbol]["deficit"]['percent'] < $scope["settings"].surplus){
+                    return
+                }
 
-				
-				if ($scope.profit[obj.symbol]["surplus"]['percent'] < $scope.profit[obj.symbol]["deficit"]['percent']) {
+                //默认是顺差数据
+                var data = {
+                    "symbol":obj.symbol,
+                    "mode":$scope.settings.mode,
+                    "buy":huobi_bids,
+                    "sell":bithumb_asks,
+                    "amount": $scope.settings.symbol[obj.symbol].amount,
+                    "percent":$scope.profit[obj.symbol]["surplus"]['percent'],
+                    "money":$scope.profit[obj.symbol]["surplus"]['money']
+                };
 
-					data['mode'] = "B->A";
-					data['buy'] = bithumb_bids;
-					data['sell'] = huobi_asks;
-					data['buy'] = bithumb_bids;
-					data['amount'] = bithumb_bids;
-					data['percent'] = $scope.profit[obj.symbol]["deficit"]['percent'];
-					data['money'] = $scope.profit[obj.symbol]["deficit"]['money'];
-
-				}
-				
-
-				if (data['percent'] >= $scope["settings"].surplus) {
-					$scope.message.unshift(data);
-				}
-					
-					
+                if ($scope.profit[obj.symbol]["deficit"]['percent'] >= $scope["settings"].deficit) {
+                    data['buy'] = bithumb_bids;
+                    data['sell'] = huobi_asks;
+                    data['percent'] = $scope.profit[obj.symbol]["deficit"]['percent'];
+                    data['money'] = $scope.profit[obj.symbol]["deficit"]['money'];
+                }
+                //添加到消息队列
+                $scope.message.unshift(data);
 			}
 
 			$scope.$apply()
@@ -1003,36 +998,9 @@ app.service('typeService', ["$rootScope", "$http", "$filter", "appCfg", function
 
 
 ;
-app.service('WebsocketService', ['$rootScope','LoginService', function($rootScope, LoginService) {
-    var proto = {
-		"EReqLogin":10001, 		// 登录
-		"EResLogin":20001,
-		"EReqJionRoom":10002, 	// 加入房间
-		"EResJionRoom":20002,
-		"EReqLeaveRoom":10003, 	// 离开房间
-		"EResLeaveRoom":20003,
-		"EReqChat":10004, 		// 聊天
-		"EResChat":20004,
-		"EReqRoomList":10005, 	// 房间列表
-		"EResRoomList":20005,
-		"EReqAddRoom":10006, 	// 添加房间
-		"EResAddRoom":20006,
-		"EReqDelRoom":10007, 	// 删除房间
-		"EResDelRoom":20007,
-		"EReqUpRoom":10008, 	// 更新房间
-		"EResUpRoom":20008,
-		"EReqRoomUserList":10009, // 获得房间用户列表
-		"EResRoomUserList":20009,
-		"EReqUseItem":10011,		//使用道具
-		"EResUseItem":20011,			//使用道具返回
-		"EReqFriendList":10013,		//获取好友在线信息
-		"EResFriendList":20013		//好友在线信息返回
+app.service('WebsocketService', ['$rootScope', function($rootScope) {
 
-
-	};
-	
 	var Service = {};
- 
     var ws = null;
 	var conn = false;
 	var reconn = false;
@@ -1106,13 +1074,12 @@ app.service('WebsocketService', ['$rootScope','LoginService', function($rootScop
 		}
 
 	  	var request = {
-			"Proto":proto.EReqChat,
+			"Proto":10002,
 			"Content":angular.toJson({"ChatType":type, "ToUserId":tuid,"Content":content})
 	  	};
 	 	sendRequest(request);
 	  
     };
-
 
 
 	//返回对象

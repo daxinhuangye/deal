@@ -20,8 +20,9 @@ import (
 
 //火币api接口
 type Huobi struct {
-	Rate      float64 //汇率
-	AccountId string  //账号id
+	AccessKey string //appid
+	SecretKey string //秘钥
+	AccountId string
 }
 
 //火币api接口
@@ -101,7 +102,7 @@ func (this *Huobi) GetAccounts() string {
 }
 
 //获取资产
-func (this *Huobi) GetBalance() string {
+func (this *Huobi) GetBalance() (map[string]float64, map[string]float64) {
 
 	account_id := beego.AppConfig.String("HuobiAccountId")
 
@@ -111,7 +112,27 @@ func (this *Huobi) GetBalance() string {
 
 	api := "https://" + HB_HOST + path + "?" + this.createSign("GET", path, params)
 
-	return this.request(api)
+	content := this.request(api)
+
+	beego.Trace(content)
+
+	list := gjson.Get(content, "data.list").Array()
+
+	trade := make(map[string]float64)
+	frozen := make(map[string]float64)
+
+	for _, v := range list {
+		currency := v.Get("currency").String()
+
+		if v.Get("type").String() == "trade" {
+			trade[currency] += v.Get("balance").Float()
+		} else {
+			frozen[currency] += v.Get("balance").Float()
+		}
+
+	}
+
+	return trade, frozen
 
 }
 

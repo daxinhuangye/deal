@@ -1,5 +1,3 @@
-
-
 <div class="page text-warning ">
     <div class="row">
         <div class="col-md-8 pad-5">
@@ -39,6 +37,37 @@
 
         <div class="col-md-4 np mt-10">
 
+            <div class="panel panel-default  mb-5">
+                <div class="panel-heading pad-10">
+                    <div class="btn-group pull-right">
+                        <a ng-click="" class="btn btn-default btn-sm">刷新</a>
+                    </div>
+                    <h6>资产状况</h6>
+                </div>
+                <div class="panel-body">
+
+                    <form class="form-horizontal" role="form">
+                            <table class="table table-striped" style="width:100%">
+                                <th>币种</th>
+                                <th>火币网/冻结</th>
+                                <th>韩币网/冻结</th>
+                                <tr >
+                                    <td> USDT / KRW</td>
+                                    <td>30000.00 / 2000 </td>
+                                    <td>500</td>
+                                </tr>
+                                <tr ng-repeat="(key, item) in settings.symbol">
+                                    <td> {{key}}</td>
+                                    <td>30000.00 </td>
+                                    <td>500</td>
+                                </tr>
+                            </table>
+                    </form>
+
+                </div>
+            </div>
+
+
             <div class="panel panel-default mb-5">
                 <div class="panel-heading pad-10">
 					<div class="btn-group pull-right">
@@ -68,7 +97,7 @@
                     </div>
                 </div>
             </div>
-			
+
  			<div class="panel panel-default mb-5">
                 <div class="panel-heading pad-10">
 					<div class="btn-group pull-right">
@@ -118,14 +147,11 @@
                             <div class="form-group">
                                 <label class="col-sm-4 control-label">顺差</label>
                                 <div class="col-sm-8">
-
                                     <div class="input-group">
                                         <input type="text" class="form-control" ng-model="settings.surplus" placeholder="顺差"
                                                ng-required="true">
                                         <span class="input-group-addon">%</span>
                                     </div>
-
-
                                 </div>
                             </div>
                         </div>
@@ -141,8 +167,6 @@
                                 </div>
                             </div>
                         </div>
-
-
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="col-sm-4 control-label">模式</label>
@@ -155,7 +179,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="col-sm-4 control-label">下单</label>
@@ -164,14 +187,34 @@
                                             ng-model="settings.order"
                                             ng-options="sel.Id as sel.Name for sel in select.order">
                                     </select>
-
                                 </div>
                             </div>
                         </div>
-
-
-
-                    <form>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">交费</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" ng-model="settings.deficit" placeholder="交易费"
+                                               ng-required="true">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">转费</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" ng-model="settings.deficit" placeholder="转账费"
+                                               ng-required="true">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
 

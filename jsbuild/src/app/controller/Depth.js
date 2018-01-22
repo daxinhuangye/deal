@@ -77,16 +77,16 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 		"mode":0,
 		"order":0,
 		"symbol":{
-			"BTC":{"amount":1, "fee":0, "cost":0, "color":false},
-			"ETH":{"amount":1, "fee":0, "cost":0, "color":false},
-			"DASH":{"amount":1, "fee":0, "cost":0, "color":false},
-			"LTC":{"amount":1, "fee":0, "cost":0, "color":false},
-			"ETC":{"amount":1, "fee":0, "cost":0, "color":false},
-			"XRP":{"amount":1, "fee":0, "cost":0, "color":false},
-			"BCH":{"amount":1, "fee":0, "cost":0, "color":false},
-			"ZEC":{"amount":1, "fee":0, "cost":0, "color":false},
-			"QTUM":{"amount":1, "fee":0, "cost":0, "color":false},
-			"EOS":{"amount":1, "fee":0, "cost":0, "color":false},
+			"BTC":{"amount":10, "fee":0, "cost":0, "color":false},
+			"ETH":{"amount":10, "fee":0, "cost":0, "color":false},
+			"DASH":{"amount":10, "fee":0, "cost":0, "color":false},
+			"LTC":{"amount":10, "fee":0, "cost":0, "color":false},
+			"ETC":{"amount":10, "fee":0, "cost":0, "color":false},
+			"XRP":{"amount":10, "fee":0, "cost":0, "color":false},
+			"BCH":{"amount":10, "fee":0, "cost":0, "color":false},
+			"ZEC":{"amount":10, "fee":0, "cost":0, "color":false},
+			"QTUM":{"amount":10, "fee":0, "cost":0, "color":false},
+			"EOS":{"amount":10, "fee":0, "cost":0, "color":false},
 		},
 
 
@@ -133,35 +133,30 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 				$scope.profit[obj.symbol]["deficit"]['percent'] = ((huobi_asks - bithumb_bids  ) / bithumb_bids) * 100;
 				$scope.profit[obj.symbol]["deficit"]['money'] = (huobi_asks - bithumb_bids ) * $scope.settings.symbol[obj.symbol].amount;
 
-				var data = {
-					"symbol":obj.symbol,
-					"mode":$scope.settings.mode,
-					"buy":huobi_bids, 
-					"sell":bithumb_asks, 
-					"amount": $scope.settings.symbol[obj.symbol].amount, 
-					"percent":$scope.profit[obj.symbol]["surplus"]['percent'], 
-					"money":$scope.profit[obj.symbol]["surplus"]['money'] 
-				};
+				//如果顺差和逆差都不满足条件直接返回
+                if ($scope.profit[obj.symbol]["surplus"]['percent'] < $scope["settings"].surplus &&  $scope.profit[obj.symbol]["deficit"]['percent'] < $scope["settings"].surplus){
+                    return
+                }
 
-				
-				if ($scope.profit[obj.symbol]["surplus"]['percent'] < $scope.profit[obj.symbol]["deficit"]['percent']) {
+                //默认是顺差数据
+                var data = {
+                    "symbol":obj.symbol,
+                    "mode":$scope.settings.mode,
+                    "buy":huobi_bids,
+                    "sell":bithumb_asks,
+                    "amount": $scope.settings.symbol[obj.symbol].amount,
+                    "percent":$scope.profit[obj.symbol]["surplus"]['percent'],
+                    "money":$scope.profit[obj.symbol]["surplus"]['money']
+                };
 
-					data['mode'] = "B->A";
-					data['buy'] = bithumb_bids;
-					data['sell'] = huobi_asks;
-					data['buy'] = bithumb_bids;
-					data['amount'] = bithumb_bids;
-					data['percent'] = $scope.profit[obj.symbol]["deficit"]['percent'];
-					data['money'] = $scope.profit[obj.symbol]["deficit"]['money'];
-
-				}
-				
-
-				if (data['percent'] >= $scope["settings"].surplus) {
-					$scope.message.unshift(data);
-				}
-					
-					
+                if ($scope.profit[obj.symbol]["deficit"]['percent'] >= $scope["settings"].deficit) {
+                    data['buy'] = bithumb_bids;
+                    data['sell'] = huobi_asks;
+                    data['percent'] = $scope.profit[obj.symbol]["deficit"]['percent'];
+                    data['money'] = $scope.profit[obj.symbol]["deficit"]['money'];
+                }
+                //添加到消息队列
+                $scope.message.unshift(data);
 			}
 
 			$scope.$apply()

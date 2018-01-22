@@ -25,6 +25,21 @@ func (this *DepthController) Prepare() {
 	this.CheckLogin()
 }
 
+//获取资产
+func (this *DepthController) Balance() {
+	//db := tsDb.NewDbBase()
+
+	oHuobi := models.Huobi{}
+	huobi_trade, huobi_frozen := oHuobi.GetBalance()
+
+	oBithumb := models.Bithumb{}
+	bithumb_res := oBithumb.GetBalance()
+
+	this.Code = 1
+	this.Result = map[string]interface{}{"HuobiTrade": huobi_trade, "HuobiFrozen": huobi_frozen, "Bithumb": bithumb_res}
+	this.TraceJson()
+}
+
 //开启实时行情
 func (this *DepthController) Start() {
 

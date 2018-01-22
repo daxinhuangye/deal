@@ -2,10 +2,11 @@ package controllers
 
 import (
 	"Deal/models"
-	"Deal/service"
+	_ "Deal/service"
 	"fmt"
-	"github.com/astaxie/beego"
 	"reflect"
+
+	"github.com/astaxie/beego"
 )
 
 type IndexController struct {
@@ -89,6 +90,7 @@ func callMethod(v *reflect.Value, method string, params []interface{}) {
 	fmt.Println("")
 }
 
+/*
 //默认网站首页
 func (this *IndexController) Start() {
 
@@ -107,3 +109,4 @@ func (this *IndexController) Stop() {
 	this.Ctx.WriteString("停止")
 
 }
+*/

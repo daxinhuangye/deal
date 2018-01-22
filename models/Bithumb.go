@@ -17,8 +17,9 @@ import (
 
 //韩国交易平台api接口
 type Bithumb struct {
-	Rate      float64 //汇率
-	AccountId string  //账号id
+	AccessKey string //appid
+	SecretKey string //秘钥
+	AccountId string
 }
 
 const (
@@ -92,14 +93,11 @@ func (this *Bithumb) GetAccounts() string {
 func (this *Bithumb) GetBalance() string {
 
 	path := "/info/balance"
-
-	content := this.privateRequest(path, []string{}, []string{})
-	if content == "" {
-		return ""
-	}
-	//beego.Trace(content)
-	krw := gjson.Get(content, "data.total_krw").String()
-	return krw
+	key := []string{"currency"}
+	value := []string{"ALL"}
+	content := this.privateRequest(path, key, value)
+	beego.Trace(content)
+	return content
 
 }
 
