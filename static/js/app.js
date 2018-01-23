@@ -21,7 +21,7 @@ app.config( ["$routeProvider", function ($routeProvider) {
 ;
 app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService",  "$timeout", "WebsocketService","BalanceService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService, $timeout, WebsocketService, BalanceService) {
     $scope.height = $scope.windowHeight - 100;
-    $scope.height2 = $scope.windowHeight - 100 - 400;
+
 	//平台数据
 	$scope.platform = PlatformService.data;
 	//资产状态
@@ -96,6 +96,7 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 	$scope.select = {
 		"mode":[{"Id":0, "Name":"买卖"}, {"Id":1, "Name":"卖买"}, {"Id":2, "Name":"同时"}],
 		"order":[{"Id":0, "Name":"手动"}, {"Id":1, "Name":"自动"}],
+		"type":[{"Id":0, "Name":"顺差"}, {"Id":1, "Name":"逆差"}],
 	};
 	//fee 币种的数量；cost 交易费：每一单总价的 XXX%；
 	$scope.settings = {
@@ -137,16 +138,43 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 
 	};
 	$scope.transactionList = [];
+	$scope.addOrder = function( symbol, type ){
+		//默认是顺差数据
+		var data = {
+			"index":index++,
+			"symbol":symbol,
+			"mode":$scope.settings.mode,
+			"buy":$scope.depth[symbol]['1']['_bids'],
+			"sell":$scope.depth[symbol]['2']['_asks'],
+			"amount": $scope.settings.symbol[symbol].amount,
+			"percent":$scope.profit[symbol]["surplus"]['percent'],
+			"money":$scope.profit[symbol]["surplus"]['money'],
+			"type":0
+		};
+
+		if (type == 1) {
+			data['buy'] = $scope.depth[symbol]['2']['_bids'];
+			data['sell'] = $scope.depth[symbol]['1']['_asks'];
+			data['percent'] = $scope.profit[symbol]["deficit"]['percent'];
+			data['money'] = $scope.profit[symbol]["deficit"]['money'];
+			data['type'] = 1;
+		}
+
+		$scope.transactionList.push(data);
+
+	};
+
 	$scope.addTransaction = function( index ){
+
 		var data = $scope.message[index];
 		data.state = 1;
-		$scope.transactionList.unshift(data);
+		$scope.transactionList.push(data);
 		
 	};
 	
 	
 	$scope.message = [];
-
+	var index = 0;
 	$scope.$on('10000', function(event, data) {
 
 			var obj = angular.fromJson(data);
@@ -178,6 +206,7 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 				$scope.profit[obj.symbol]["deficit"]['percent'] = ((huobi_asks - bithumb_bids  ) / bithumb_bids) * 100;
 				$scope.profit[obj.symbol]["deficit"]['money'] = (huobi_asks - bithumb_bids ) * $scope.settings.symbol[obj.symbol].amount;
 
+
                 $scope.upSort(obj.symbol, $scope.profit[obj.symbol]["surplus"]['percent'], $scope.profit[obj.symbol]["deficit"]['percent']);
 
 				//如果顺差和逆差都不满足条件直接返回
@@ -187,13 +216,15 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 
                 //默认是顺差数据
                 var data = {
+	                "index":index++,
                     "symbol":obj.symbol,
                     "mode":$scope.settings.mode,
                     "buy":huobi_bids,
                     "sell":bithumb_asks,
                     "amount": $scope.settings.symbol[obj.symbol].amount,
                     "percent":$scope.profit[obj.symbol]["surplus"]['percent'],
-                    "money":$scope.profit[obj.symbol]["surplus"]['money']
+                    "money":$scope.profit[obj.symbol]["surplus"]['money'],
+                    "type":0
                 };
 
                 if ($scope.profit[obj.symbol]["deficit"]['percent'] >= $scope["settings"].deficit) {
@@ -201,9 +232,10 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
                     data['sell'] = huobi_asks;
                     data['percent'] = $scope.profit[obj.symbol]["deficit"]['percent'];
                     data['money'] = $scope.profit[obj.symbol]["deficit"]['money'];
+                    data['type'] = 1;
                 }
                 //添加到消息队列
-                $scope.message.unshift(data);
+                $scope.message.push(data);
 			}
 
 			$scope.$apply()

@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"Deal/models"
+	"Deal/service"
 	_ "fmt"
+	"github.com/astaxie/beego"
 	"tsEngine/tsDb"
-
-	_ "github.com/astaxie/beego"
 )
 
 type OrderController struct {
@@ -30,10 +30,8 @@ func (this *OrderController) List() {
 //下单
 func (this *OrderController) Add() {
 
-	o := models.Secret{}
+	o := models.Order{}
 	o.Uid = this.AdminId
-	o.AccessKey = this.GetString("AccessKey")
-	o.SecretKey = this.GetString("SecretKey")
 
 	db := tsDb.NewDbBase()
 	_, err := db.DbInsert(&o)
@@ -43,14 +41,15 @@ func (this *OrderController) Add() {
 		this.Msg = "数据库操作异常，请联系管理员"
 		this.TraceJson()
 	}
-
+	//订单监听
+	go service.CheckOrder(1, "12346")
 	this.Code = 1
 	this.Result = o
 	this.TraceJson()
 }
 
 //退单
-func (this *SecretController) Del() {
+func (this *OrderController) Del() {
 
 	o := models.Secret{}
 	o.Id, _ = this.GetInt64("Id")

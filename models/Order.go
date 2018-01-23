@@ -8,13 +8,16 @@ import (
 //订单表模型
 type Order struct {
 	Id      int64
+	Uid     int64
 	OrderId string
 	Pid     float64
 	Amount  string
-	Price   string
+	buy     string
+	sell    string
 	Symbol  string
 	Type    string
 	Time    string
+	State   int64
 }
 
 func init() {

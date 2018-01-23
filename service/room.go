@@ -102,14 +102,25 @@ func broadcastWebSocket(event models.Event) {
 		beego.Error("Fail to marshal event:", err)
 		return
 	}
-/*
+
 	if event.User != 0 {
 		for sub := subscribers.Front(); sub != nil; sub = sub.Next() {
 			// Immediately send event to WebSocket users.
 			if event.User == sub.Value.(Subscriber).Name {
 				ws := sub.Value.(Subscriber).Conn
+				if ws != nil {
+					if ws.WriteMessage(websocket.TextMessage, data) != nil {
+						// 写入错误 断开连接
+						unsubscribe <- sub.Value.(Subscriber).Name
+					}
+				}
+				break
 			}
 
+		}
+	} else {
+		for sub := subscribers.Front(); sub != nil; sub = sub.Next() {
+			// Immediately send event to WebSocket users.
 			ws := sub.Value.(Subscriber).Conn
 			if ws != nil {
 				if ws.WriteMessage(websocket.TextMessage, data) != nil {
@@ -119,17 +130,7 @@ func broadcastWebSocket(event models.Event) {
 			}
 		}
 	}
-	*/
-	for sub := subscribers.Front(); sub != nil; sub = sub.Next() {
-		// Immediately send event to WebSocket users.
-		ws := sub.Value.(Subscriber).Conn
-		if ws != nil {
-			if ws.WriteMessage(websocket.TextMessage, data) != nil {
-				// 写入错误 断开连接
-				unsubscribe <- sub.Value.(Subscriber).Name
-			}
-		}
-	}
+
 }
 
 func Join(user int64, ws *websocket.Conn) {
