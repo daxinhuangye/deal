@@ -90,14 +90,29 @@ func (this *Bithumb) GetAccounts() string {
 }
 
 //获取资产
-func (this *Bithumb) GetBalance() string {
+func (this *Bithumb) GetBalance() (map[string]float64, map[string]float64) {
 
 	path := "/info/balance"
 	key := []string{"currency"}
 	value := []string{"ALL"}
 	content := this.privateRequest(path, key, value)
 	beego.Trace(content)
-	return content
+	currency := []string{"KRW", "BTC", "DASH", "EOS", "ETC", "ETH", "LTC", "QTUM", "XRP", "ZEC", "BCH"}
+
+	trade := make(map[string]float64)
+	frozen := make(map[string]float64)
+	for _, v := range currency {
+		filed := fmt.Sprintf("data.in_use_%s", strings.ToLower(v))
+		frozen[v] = gjson.Get(content, filed).Float()
+		filed = fmt.Sprintf("data.available_%s", strings.ToLower(v))
+		trade[v] = gjson.Get(content, filed).Float()
+		if v == "KRW" {
+			frozen["Money"] = frozen[v]
+			trade["Money"] = trade[v]
+		}
+	}
+
+	return trade, frozen
 
 }
 

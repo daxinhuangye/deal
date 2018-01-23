@@ -122,8 +122,10 @@ func (this *Huobi) GetBalance() (map[string]float64, map[string]float64) {
 	frozen := make(map[string]float64)
 
 	for _, v := range list {
-		currency := v.Get("currency").String()
-
+		currency := strings.ToUpper(v.Get("currency").String())
+		if currency == "USDT" {
+			currency = "Money"
+		}
 		if v.Get("type").String() == "trade" {
 			trade[currency] += v.Get("balance").Float()
 		} else {

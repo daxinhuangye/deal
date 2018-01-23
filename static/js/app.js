@@ -20,63 +20,65 @@ app.config( ["$routeProvider", function ($routeProvider) {
 
 ;
 app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService",  "$timeout", "WebsocketService","BalanceService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService, $timeout, WebsocketService, BalanceService) {
+    $scope.height = $scope.windowHeight - 100;
+    $scope.height2 = $scope.windowHeight - 100 - 400;
+	//平台数据
+	$scope.platform = PlatformService.data;
 	//资产状态
 	$scope.balance = BalanceService.data;
-	console.log("资产：", $scope.balance);
-	$scope.platform = PlatformService.data;
+	//更新资产状况
+    $scope.getBalance = function(){
+        BalanceService.getData();
+    };
+
+	$scope.tab = 0;
+	$scope.active = function(tab) {
+        $scope.tab = tab;
+	};
+	//行情数据
 	$scope.depth = {
 		"BTC":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-
 		},
 		"ETH":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-
 		},
 		"DASH":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-
 		},
 		"LTC":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-
 		},
 		"ETC":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-
 		},
 		"XRP":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-
 		},
 		"BCH":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-
 		},
 		"ZEC":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-
 		},
 		"QTUM":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-
 		},
 		"EOS":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		}
-
 	};
-
+	//盈利数据
 	$scope.profit = {
 		"BTC":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
 		"ETH":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
@@ -90,11 +92,12 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 		"EOS":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
 	};
 
+	//下拉配置
 	$scope.select = {
-		"mode":[{"Id":0, "Name":"买卖"}, {"Id":1, "Name":"卖买"}],
+		"mode":[{"Id":0, "Name":"买卖"}, {"Id":1, "Name":"卖买"}, {"Id":2, "Name":"同时"}],
 		"order":[{"Id":0, "Name":"手动"}, {"Id":1, "Name":"自动"}],
 	};
-	////fee 币种的数量；cost 交易费：每一单总价的 XXX%；
+	//fee 币种的数量；cost 交易费：每一单总价的 XXX%；
 	$scope.settings = {
 		"surplus" : 15,
 		"deficit" : 5,
@@ -115,7 +118,24 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 
 
 	};
+	//差值排序
+	$scope.sortList = [];
+	$scope.upSort = function(symbol, surplus, deficit ){
+        var key=-1;
+		for (var i=0; i<$scope.sortList.length; i++) {
+            if ($scope.sortList[i].symbol == symbol) {
+            	key = i;
+            	break;
+            }
+        }
+        var data = {"symbol":symbol, "surplus":surplus, "deficit":deficit, "_deficit":Math.abs(deficit) };
+        if(key>=0){
+            $scope.sortList[key] = data;
+		}else{
+            $scope.sortList.push(data)
+		}
 
+	};
 	$scope.transactionList = [];
 	$scope.addTransaction = function( index ){
 		var data = $scope.message[index];
@@ -157,6 +177,8 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 				//逆差计算
 				$scope.profit[obj.symbol]["deficit"]['percent'] = ((huobi_asks - bithumb_bids  ) / bithumb_bids) * 100;
 				$scope.profit[obj.symbol]["deficit"]['money'] = (huobi_asks - bithumb_bids ) * $scope.settings.symbol[obj.symbol].amount;
+
+                $scope.upSort(obj.symbol, $scope.profit[obj.symbol]["surplus"]['percent'], $scope.profit[obj.symbol]["deficit"]['percent']);
 
 				//如果顺差和逆差都不满足条件直接返回
                 if ($scope.profit[obj.symbol]["surplus"]['percent'] < $scope["settings"].surplus &&  $scope.profit[obj.symbol]["deficit"]['percent'] < $scope["settings"].surplus){
@@ -572,6 +594,41 @@ app.directive("morrisChart", [function () {
     }
 }]);
 ;
+app.directive('resize', ["$window", function ($window) {
+    return function (scope, element) {
+        var w = angular.element($window);
+        scope.getWindowDimensions = function () {
+            return {
+                'h': w.height(),
+                'w': w.width()
+            };
+        };
+        scope.$watch(scope.getWindowDimensions, function (newValue, oldValue) {
+            scope.windowHeight = newValue.h;
+            scope.windowWidth = newValue.w;
+
+
+        }, true);
+
+        w.bind('resize', function () {
+            scope.$apply();
+        });
+    }
+}]);
+
+;
+app.directive('rightClick', ["$parse", function($parse) {
+    return function(scope, element, attrs) {
+        var fn = $parse(attrs.ngRightClick);
+        element.bind('contextmenu', function(event) {
+            scope.$apply(function() {
+                event.preventDefault();
+                fn(scope, {$event:event});
+            });
+        });
+    };
+}]);
+;
 app.directive("sparkline", [function () {
     return {
         restrict: "A", scope: {data: "=", options: "="}, link: function (scope, ele) {
@@ -673,14 +730,17 @@ app.filter('FileSize', [function() {
 app.service('BalanceService', ["$rootScope", "$http", "$filter", "appCfg", function($rootScope, $http, $filter, appCfg) {
 	var self = this;
 	
-	this.data = {};
+	this.data = {
+        "Items":{}
+	};
 	
 	this.getData = function() {
+        self.data.Items = {};
 		var url = appCfg.AppPrefix + "/api/balance";
 		
 		$http.get(url).success(function(data, status, headers, config) {
 			if($filter("CheckError")(data)){
-				self.data = data.Data;
+                self.data.Items = data.Data;
 			}
 		})
 		.error(function(data, status, headers, config) {

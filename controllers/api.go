@@ -3,7 +3,8 @@ package controllers
 import (
 	"Deal/models"
 	_ "fmt"
-	_"github.com/astaxie/beego"
+
+	_ "github.com/astaxie/beego"
 )
 
 type ApiController struct {
@@ -23,9 +24,9 @@ func (this *ApiController) Balance() {
 	huobi_trade, huobi_frozen := oHuobi.GetBalance()
 
 	oBithumb := models.Bithumb{}
-	bithumb_res := oBithumb.GetBalance()
+	bithumb_trade, bithumb_frozen := oBithumb.GetBalance()
 
 	this.Code = 1
-	this.Result = map[string]interface{}{"HuobiTrade": huobi_trade, "HuobiFrozen": huobi_frozen, "Bithumb": bithumb_res}
+	this.Result = map[string]interface{}{"HuobiTrade": huobi_trade, "HuobiFrozen": huobi_frozen, "BithumbTrade": bithumb_trade, "BithumbFrozen": bithumb_frozen}
 	this.TraceJson()
 }
