@@ -15,8 +15,8 @@
                                     <th>买盘</th>
                                     <tr ng-repeat="item in symbol">
                                         <td>{{item.platform|arrayAttr:platform.Items:'Name'}}</td>
-                                        <td>{{item._bids}}</td>
-                                        <td>{{item._asks}}</td>
+                                        <td>{{item._bids | number:2}}</td>
+                                        <td>{{item._asks | number:2}}</td>
                                     </tr>
                                     <tr ng-class="{'text-danger':profit[key]['surplus'].percent >= percent}">
                                         <td>顺差：</td>
@@ -74,7 +74,7 @@
                                         <div data-slim-scroll data-scroll-height="242">
 
                                                 <table class="table table-striped">
-                                                    <tr ng-repeat="item in sortList | orderBy :['+_deficit']">
+                                                    <tr ng-repeat="item in sortList | orderBy :['-deficit']">
                                                         <td>{{item.symbol}}</td>
                                                         <td>{{item.deficit | number:2}}%</td>
                                                         <td><a ng-click="addOrder(item.symbol, 1);" class="btn btn-default btn-sm" ng-if="tab<4">交易</a></td>
@@ -85,61 +85,94 @@
                                     </div>
                                 </div>
                             </tab>
+ 							
 
                             <tab heading="基础设置" ng-click="active(1);" >
                                 <div data-slim-scroll data-scroll-height="250">
-                                <form class="form-horizontal mt-10" role="form">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="col-sm-4 control-label">顺差</label>
-                                            <div class="col-sm-8">
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" ng-model="settings.surplus"
-                                                           placeholder="顺差"
-                                                           ng-required="true">
-                                                    <span class="input-group-addon">%</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="col-sm-4 control-label">逆差</label>
-                                            <div class="col-sm-8">
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" ng-model="settings.deficit"
-                                                           placeholder="逆差"
-                                                           ng-required="true">
-                                                    <span class="input-group-addon">%</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="col-sm-4 control-label">模式</label>
-                                            <div class="col-sm-8">
-                                                <select class="form-control"
-                                                        ng-model="settings.mode"
-                                                        ng-options="sel.Id as sel.Name for sel in select.mode">
-                                                </select>
+	                                <form class="form-horizontal mt-10" role="form">
+										<div class="col-md-6">
+	                                        <div class="form-group">
+	                                            <label class="col-sm-4 control-label">火币</label>
+	                                            <div class="col-sm-8">
+	                                                <div class="input-group">
+	                                                    <input type="text" class="form-control" ng-model="settings.rate['1']"
+	                                                           placeholder="火币网"
+	                                                           ng-required="true">
+	                                                    <span class="input-group-addon">汇率</span>
+	                                                </div>
+	                                            </div>
+	                                        </div>
+	                                    </div>
+	                                    <div class="col-md-6">
+	                                        <div class="form-group">
+	                                            <label class="col-sm-4 control-label">韩币</label>
+	                                            <div class="col-sm-8">
+	                                                <div class="input-group">
+	                                                    <input type="text" class="form-control" ng-model="settings.rate['2']"
+	                                                           placeholder="韩币网"
+	                                                           ng-required="true">
+														<span class="input-group-addon">汇率</span>
+	                                                    
+	                                                </div>
+	                                            </div>
+	                                        </div>
+	                                    </div>
 
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="col-sm-4 control-label">下单</label>
-                                            <div class="col-sm-8">
-                                                <select class="form-control"
-                                                        ng-model="settings.order"
-                                                        ng-options="sel.Id as sel.Name for sel in select.order">
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
+	                                   
+	                                    <div class="col-md-6">
+	                                        <div class="form-group">
+	                                            <label class="col-sm-4 control-label">模式</label>
+	                                            <div class="col-sm-8">
+	                                                <select class="form-control"
+	                                                        ng-model="settings.mode"
+	                                                        ng-options="sel.Id as sel.Name for sel in select.mode">
+	                                                </select>
+	
+	                                            </div>
+	                                        </div>
+	                                    </div>
+	                                    <div class="col-md-6">
+	                                        <div class="form-group">
+	                                            <label class="col-sm-4 control-label">下单</label>
+	                                            <div class="col-sm-8">
+	                                                <select class="form-control"
+	                                                        ng-model="settings.order"
+	                                                        ng-options="sel.Id as sel.Name for sel in select.order">
+	                                                </select>
+	                                            </div>
+	                                        </div>
+	                                    </div>
 
-                                </form>
+	 									<div class="col-md-6">
+	                                        <div class="form-group">
+	                                            <label class="col-sm-4 control-label">顺差</label>
+	                                            <div class="col-sm-8">
+	                                                <div class="input-group">
+	                                                    <input type="text" class="form-control" ng-model="settings.surplus"
+	                                                           placeholder="顺差"
+	                                                           ng-required="true">
+	                                                    <span class="input-group-addon">%</span>
+	                                                </div>
+	                                            </div>
+	                                        </div>
+	                                    </div>
+	                                    <div class="col-md-6">
+	                                        <div class="form-group">
+	                                            <label class="col-sm-4 control-label">逆差</label>
+	                                            <div class="col-sm-8">
+	                                                <div class="input-group">
+	                                                    <input type="text" class="form-control" ng-model="settings.deficit"
+	                                                           placeholder="逆差"
+	                                                           ng-required="true">
+	                                                    <span class="input-group-addon">%</span>
+	                                                </div>
+	                                            </div>
+	                                        </div>
+	                                    </div>
+										
+	
+	                                </form>
+								
                                 </div>
 
                             </tab>
@@ -151,7 +184,7 @@
                                             <label class="col-sm-4 control-label">{{key}}</label>
                                             <div class="col-sm-8">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control" ng-model="settings.symbol[key].amount"
+                                                    <input type="text" class="form-control" ng-model="item.amount"
                                                            placeholder="{{key}}交易数量"
                                                            ng-required="true">
                                                     <span class="input-group-addon">个</span>
@@ -178,19 +211,19 @@
                                                 <tr ng-repeat="(key, item) in settings.symbol">
                                                     <td> {{key}}</td>
 
-                                                    <td><input type="text" class="form-control" ng-model="settings.symbol[key].cost"
+                                                    <td><input type="text" class="form-control" ng-model="item.fee['1'][0]"
                                                                placeholder="交易费"
                                                                ng-required="true">
                                                     </td>
-                                                    <td><input type="text" class="form-control" ng-model="settings.symbol[key].fee"
+                                                    <td><input type="text" class="form-control" ng-model="item.fee['1'][1]"
                                                                placeholder="转账费"
                                                                ng-required="true"></td>
 
-                                                    <td><input type="text" class="form-control" ng-model="settings.symbol[key].cost"
+                                                    <td><input type="text" class="form-control" ng-model="item.fee['2'][0]"
                                                                placeholder="交易费"
                                                                ng-required="true">
                                                     </td>
-                                                    <td><input type="text" class="form-control" ng-model="settings.symbol[key].fee"
+                                                    <td><input type="text" class="form-control" ng-model="item.fee['2'][1]"
                                                                placeholder="转账费"
                                                                ng-required="true">
                                                     </td>
@@ -208,23 +241,26 @@
 
                                     <div class="panel-body pad-5">
                                         <table class="table table-striped mb-5" >
-                                            <th width="33%">币种</th>
-                                            <th width="33%">可用/冻结（火）</th>
-                                            <th width="33%">可用/冻结（韩）</th>
+                                            <th width="30%">币种</th>
+                                            <th width="30%">可用/冻结（火）</th>
+                                            <th width="30%">可用/冻结（韩）</th>
+                                            <th width="10%">操作</th>
                                         </table>
 
                                         <div data-slim-scroll data-scroll-height="196">
 
                                             <table class="table table-striped" >
                                                 <tr  ng-if="balance.Items.HuobiTrade['Money']>0 || balance.Items.HuobiFrozen['Money']>0 || balance.Items.BithumbTrade['Money']>0 || balance.Items.BithumbFrozen['Money']>0">
-                                                    <td width="33%">现金(CNY)</td>
-                                                    <td width="33%">{{balance.Items.HuobiTrade["Money"] * 7}} / {{balance.Items.HuobiFrozen["Money"] * 7}}</td>
-                                                    <td width="33%">{{balance.Items.BithumbTrade["Money"] * 0.006}} / {{balance.Items.BithumbFrozen["Money"]* 0.006}}</td>
+                                                    <td width="30%">现金(CNY)</td>
+                                                    <td width="30%">{{balance.Items.HuobiTrade["Money"] * 7 | number:2}} / {{balance.Items.HuobiFrozen["Money"] * 7 | number:2}}</td>
+                                                    <td width="30%">{{balance.Items.BithumbTrade["Money"] * 0.006 | number:2}} / {{balance.Items.BithumbFrozen["Money"]* 0.006 | number:2}}</td>
+                                                    <td width="10%"><a ng-click="save();" class="btn btn-default btn-sm" >平衡</a></td>
                                                 </tr>
                                                 <tr ng-if="balance.Items.HuobiTrade[key]>0 || balance.Items.HuobiFrozen[key]>0 || balance.Items.BithumbTrade[key]>0 || balance.Items.BithumbFrozen[key]>0" ng-repeat="(key, item) in settings.symbol">
-                                                    <td width="33%"> {{key}}</td>
-                                                    <td width="33%">{{balance.Items.HuobiTrade[key]}}/{{balance.Items.HuobiFrozen[key]}}</td>
-                                                    <td width="33%">{{balance.Items.BithumbTrade[key]}}/{{balance.Items.BithumbFrozen[key]}}</td>
+                                                    <td width="30%"> {{key}}</td>
+                                                    <td width="30%">{{balance.Items.HuobiTrade[key]}}/{{balance.Items.HuobiFrozen[key]}}</td>
+                                                    <td width="30%">{{balance.Items.BithumbTrade[key]}}/{{balance.Items.BithumbFrozen[key]}}</td>
+                                                    <td width="10%"><a ng-click="save();" class="btn btn-default btn-sm" >平衡</a></td>
                                                 </tr>
                                             </table>
 

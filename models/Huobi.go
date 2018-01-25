@@ -36,14 +36,14 @@ const (
 )
 
 //行情数据 btcusdt
-func (this *Huobi) Depth(symbol string, num float64) (float64, float64) {
+func (this *Huobi) Depth(symbol string, num float64) (float64, float64, int64) {
 
 	api := "https://" + HB_HOST + "/market/depth?type=step5&symbol=" + symbol
 	//beego.Trace("huobiApi:", api)
 	content := this.request(api)
 	//beego.Trace("返回值：", content)
 	if content == "" {
-		return 0, 0
+		return 0, 0, 0
 	}
 
 	var total, buy, sell float64
@@ -73,8 +73,9 @@ func (this *Huobi) Depth(symbol string, num float64) (float64, float64) {
 		}
 
 	}
-
-	return buy, sell
+	//时间
+	ts := gjson.Get(content, "tick.ts").Int()
+	return buy, sell, ts
 
 }
 

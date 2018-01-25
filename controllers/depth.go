@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 	"tsEngine/tsDb"
-	"tsEngine/tsTime"
 
 	"github.com/astaxie/beego"
 	"github.com/gorilla/websocket"
@@ -97,7 +96,8 @@ func (this *DepthController) Join() {
 }
 
 func GetDepth(platform string, symbol string) {
-	//depth := make(map[string]string)
+	huobi_rate, _ := beego.AppConfig.Float("HuobiRate")
+	bithumb_rate, _ := beego.AppConfig.Float("BithumbRate")
 	switch platform {
 	case "huobi":
 		obj := models.Huobi{}
@@ -106,15 +106,12 @@ func GetDepth(platform string, symbol string) {
 			if !service.GetDepthState() {
 				return
 			}
-			buy, sell := obj.Depth(_symbol, 0)
-			//key := fmt.Sprintf("huobi_%s", symbol)
-			//value := fmt.Sprintf("%f_%f", buy, sell)
-			//if buy != 0 && sell != 0 && depth[key] != value {
+			buy, sell, timestamp := obj.Depth(_symbol, 0)
+
 			if buy != 0 && sell != 0 {
-				//depth[key] = value
-				_buy := buy * 7
-				_sell := sell * 7
-				timestamp := tsTime.CurrSe()
+
+				_buy := buy * huobi_rate
+				_sell := sell * huobi_rate
 				data := fmt.Sprintf(`{"symbol":"%s", "platform":1, "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
 
 				service.Publish(0, data)
@@ -129,15 +126,11 @@ func GetDepth(platform string, symbol string) {
 			if !service.GetDepthState() {
 				return
 			}
-			buy, sell := obj.Depth(symbol, 0)
-			//key := fmt.Sprintf("bithumb_%s", symbol)
-			//value := fmt.Sprintf("%f_%f", buy, sell)
-			//if buy != 0 && sell != 0 && depth[key] != value {
+			buy, sell, timestamp := obj.Depth(symbol, 0)
+
 			if buy != 0 && sell != 0 {
-				//depth[key] = value
-				_buy := buy * 0.006
-				_sell := sell * 0.006
-				timestamp := tsTime.CurrSe()
+				_buy := buy * bithumb_rate
+				_sell := sell * bithumb_rate
 				data := fmt.Sprintf(`{"symbol":"%s", "platform":2, "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
 				service.Publish(0, data)
 			}

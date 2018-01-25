@@ -77,23 +77,25 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 		"order":[{"Id":0, "Name":"手动"}, {"Id":1, "Name":"自动"}],
 		"type":[{"Id":0, "Name":"顺差"}, {"Id":1, "Name":"逆差"}],
 	};
-	//fee 币种的数量；cost 交易费：每一单总价的 XXX%；
+	$scope.precision = 
+	//参数配置
 	$scope.settings = {
+		"rate" : {"1": 7, "2":0.006},
 		"surplus" : 15,
 		"deficit" : 5,
 		"mode":0,
 		"order":0,
 		"symbol":{
-			"BTC":{"amount":10, "fee":0, "cost":0, "color":false},
-			"ETH":{"amount":10, "fee":0, "cost":0, "color":false},
-			"DASH":{"amount":10, "fee":0, "cost":0, "color":false},
-			"LTC":{"amount":10, "fee":0, "cost":0, "color":false},
-			"ETC":{"amount":10, "fee":0, "cost":0, "color":false},
-			"XRP":{"amount":10, "fee":0, "cost":0, "color":false},
-			"BCH":{"amount":10, "fee":0, "cost":0, "color":false},
-			"ZEC":{"amount":10, "fee":0, "cost":0, "color":false},
-			"QTUM":{"amount":10, "fee":0, "cost":0, "color":false},
-			"EOS":{"amount":10, "fee":0, "cost":0, "color":false},
+			"BTC":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
+			"ETH":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
+			"DASH":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
+			"LTC":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
+			"ETC":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
+			"XRP":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
+			"BCH":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
+			"ZEC":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
+			"QTUM":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
+			"EOS":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
 		},
 
 
@@ -163,6 +165,8 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 				return
 			}
 			$scope.depth[obj.symbol][obj.platform] = obj;
+			$scope.depth[obj.symbol][obj.platform]._asks =  $scope.depth[obj.symbol][obj.platform].asks * $scope.settings.rate[obj.platform];
+			$scope.depth[obj.symbol][obj.platform]._bids =  $scope.depth[obj.symbol][obj.platform].bids * $scope.settings.rate[obj.platform];
 
 			var huobi_bids = $scope.depth[obj.symbol]['1']['_bids'];
 			var huobi_asks = $scope.depth[obj.symbol]['1']['_asks'];
@@ -176,8 +180,8 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 				$scope.settings.symbol[obj.symbol].color = true;
 				$timeout(function(){
 					$scope.settings.symbol[obj.symbol].color = false;
-					return
-				},500);
+					//return
+				},1000);
 				//顺差计算
 				$scope.profit[obj.symbol]["surplus"]['percent'] = ((bithumb_asks - huobi_bids  ) / huobi_bids) * 100;
 				$scope.profit[obj.symbol]["surplus"]['money'] = (bithumb_asks - huobi_bids ) * $scope.settings.symbol[obj.symbol].amount;
@@ -185,7 +189,7 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 				$scope.profit[obj.symbol]["deficit"]['percent'] = ((huobi_asks - bithumb_bids  ) / bithumb_bids) * 100;
 				$scope.profit[obj.symbol]["deficit"]['money'] = (huobi_asks - bithumb_bids ) * $scope.settings.symbol[obj.symbol].amount;
 
-
+				//放入排序队列
                 $scope.upSort(obj.symbol, $scope.profit[obj.symbol]["surplus"]['percent'], $scope.profit[obj.symbol]["deficit"]['percent']);
 
 				//如果顺差和逆差都不满足条件直接返回

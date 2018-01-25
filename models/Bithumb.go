@@ -28,14 +28,14 @@ const (
 )
 
 //行情数据 {currency} = BTC, ETH, DASH, LTC, ETC, XRP, BCH, XMR, ZEC, QTUM, BTG, EOS (基本值: BTC), ALL(全部
-func (this *Bithumb) Depth(symbol string, num float64) (float64, float64) {
+func (this *Bithumb) Depth(symbol string, num float64) (float64, float64, int64) {
 
 	path := fmt.Sprintf("/public/orderbook/%s?group_orders=%d&count=%d", symbol, 1, 20)
 
 	content := this.publicRequest(path)
 	//beego.Trace("韩国行情：", content)
 	if content == "" {
-		return 0, 0
+		return 0, 0, 0
 	}
 
 	var total, buy, sell float64
@@ -45,6 +45,7 @@ func (this *Bithumb) Depth(symbol string, num float64) (float64, float64) {
 		total += v.Get("quantity").Float()
 		if total >= num {
 			buy = v.Get("price").Float()
+			break
 		}
 
 	}
@@ -54,17 +55,18 @@ func (this *Bithumb) Depth(symbol string, num float64) (float64, float64) {
 	//买盘
 	bids := gjson.Get(content, "data.bids").Array()
 
-	for k, v := range bids {
-		if k == 0 {
-			sell = v.Get("price").Float()
-		}
+	for _, v := range bids {
 		total += v.Get("quantity").Float()
+		if total >= num {
+			sell = v.Get("price").Float()
+			break
+		}
 
 	}
-	if total < num {
-		sell = 0
-	}
-	return buy, sell
+
+	ts := gjson.Get(content, "data.timestamp").Int()
+
+	return buy, sell, ts
 
 }
 
