@@ -59,16 +59,16 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 	};
 	//盈利数据
 	$scope.profit = {
-		"BTC":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
-		"ETH":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
-		"DASH":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
-		"LTC":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
-		"ETC":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
-		"XRP":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
-		"BCH":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
-		"ZEC":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
-		"QTUM":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
-		"EOS":{"surplus":{"percent":0, "money":0}, "deficit":{"percent":0, "money":0}},
+		"BTC":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
+		"ETH":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
+		"DASH":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
+		"LTC":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
+		"ETC":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
+		"XRP":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
+		"BCH":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
+		"ZEC":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
+		"QTUM":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
+		"EOS":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
 	};
 
 	//下拉配置
@@ -173,7 +173,9 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 		//计算转账费
 		var huobi_transfer = huobi_asks * $scope.settings.Items.symbol[obj.symbol].fee["1"][1];
 		var bithumb_transfer = bithumb_asks * $scope.settings.Items.symbol[obj.symbol].fee["2"][1];
-
+		if(obj.symbol == "XRP") {
+			console.log("火币买单价：",huobi_bids, "火币总额：", huobi_bids_total, "交易费：", huobi_bids_fee, "转账费用：", huobi_transfer);
+		}
 		if(huobi_bids!=0 && huobi_bids !=0 && bithumb_bids!=0 && bithumb_asks!=0){
 				$scope.settings.Items.symbol[obj.symbol].color = true;
 				$timeout(function(){
@@ -184,11 +186,11 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 				//顺差计算
 				$scope.profit[obj.symbol]["surplus"]['money'] = bithumb_bids_total - huobi_asks_total - bithumb_bids_fee - huobi_asks_fee - huobi_transfer;
 				$scope.profit[obj.symbol]["surplus"]['percent'] = ($scope.profit[obj.symbol]["surplus"]['money'] / huobi_asks_total) * 100;
-
+				$scope.profit[obj.symbol]["surplus"]['formula'] = bithumb_bids_total +"-"+ huobi_asks_total +"-"+ bithumb_bids_fee +"-"+ huobi_asks_fee +"-"+ huobi_transfer;
 				//逆差计算
 				$scope.profit[obj.symbol]["deficit"]['money'] = huobi_bids_total - bithumb_asks_total - huobi_bids_fee - bithumb_asks_fee - bithumb_transfer ;
 				$scope.profit[obj.symbol]["deficit"]['percent'] = ($scope.profit[obj.symbol]["deficit"]['money'] / bithumb_asks_total) * 100;
-
+				$scope.profit[obj.symbol]["deficit"]['formula'] = huobi_bids_total +"-"+ bithumb_asks_total +"-"+ huobi_bids_fee +"-"+ bithumb_asks_fee +"-"+ bithumb_transfer ;
 				//放入排序队列
                 $scope.upSort(obj.symbol, $scope.profit[obj.symbol]["surplus"]['percent'], $scope.profit[obj.symbol]["deficit"]['percent']);
 
@@ -218,7 +220,7 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
                     data['type'] = 2;
                 }
                 //添加到消息队列
-                $scope.message.push(data);
+                //$scope.message.push(data);
 			}
 
 			$scope.$apply()

@@ -116,7 +116,7 @@ func GetDepth(platform string, symbol string) {
 				service.Publish(0, data)
 			}
 
-			time.Sleep(1 * time.Second)
+			time.Sleep(100 * time.Millisecond)
 		}
 
 	case "bithumb":
@@ -133,7 +133,7 @@ func GetDepth(platform string, symbol string) {
 				data := fmt.Sprintf(`{"symbol":"%s", "platform":2, "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, bids, asks, _bids, _asks, timestamp)
 				service.Publish(0, data)
 			}
-			time.Sleep(1 * time.Second)
+			time.Sleep(100 * time.Millisecond)
 
 		}
 	}

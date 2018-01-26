@@ -62,10 +62,13 @@ func (this *Huobi) GetRate() float64 {
 //行情数据 btcusdt
 func (this *Huobi) Depth(symbol string, num float64) (float64, float64, int64) {
 
-	api := "https://" + HB_HOST + "/market/depth?type=step5&symbol=" + symbol
+	api := "https://" + HB_HOST + "/market/depth?type=step0&symbol=" + symbol
 	//beego.Trace("huobiApi:", api)
 	content := this.request(api)
-	//beego.Trace("返回值：", content)
+	if symbol == "xrpusdt" {
+		beego.Trace("xrp价格:", content)
+	}
+
 	if content == "" {
 		return 0, 0, 0
 	}

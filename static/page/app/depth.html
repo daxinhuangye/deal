@@ -6,28 +6,28 @@
                     <div class="col-md-4 pad-5" ng-if="settings.Items.symbol[key].amount>0">
                         <div class="panel panel-default " ng-class=" {'market-buy': settings.Items.symbol[key].color} ">
                             <div class="panel-heading">
-                                <h3 class="panel-title">{{key}}行情<div class="pull-right"> 数量：100个</div></h3>
+                                <h3 class="panel-title">{{key}}行情<div class="pull-right"> 预留区域</div></h3>
 
                             </div>
                             <div class="panel-body pad-10 ">
                                 <table class="table table-striped">
                                     <th>平台</th>
-                                    <th>卖盘</th>
                                     <th>买盘</th>
+                                    <th>卖盘</th>
                                     <tr ng-repeat="item in symbol">
                                         <td>{{item.platform|arrayAttr:platform.Items:'Name'}}</td>
-                                        <td>{{item._bids | number:2}}</td>
-                                        <td>{{item._asks | number:2}}</td>
+                                        <td title="CNY:{{item._bids | number:2}}">{{item.bids | number:4}}</td>
+                                        <td title="CNY:{{item._asks | number:2}}">{{item.asks | number:4}}</td>
                                     </tr>
-                                    <tr ng-class="{'text-danger':profit[key]['surplus'].percent >= percent}">
+                                    <tr ng-class="{'text-danger':profit[key]['surplus'].percent >= percent}" title="{{profit[key]['surplus'].formula}}">
                                         <td>顺差：</td>
                                         <td>{{profit[key]["surplus"].percent | number:2}}%</td>
-                                        <td>{{profit[key]["surplus"].money| number:2}}</td>
+                                        <td>{{profit[key]["surplus"].money| number:2}} (CNY)</td>
                                     </tr>
-                                    <tr ng-class="{'text-danger':profit[key]['deficit'].percent >= percent}">
+                                    <tr ng-class="{'text-danger':profit[key]['deficit'].percent >= percent}"  title="{{profit[key]['deficit'].formula}}">
                                         <td>逆差：</td>
                                         <td>{{profit[key]["deficit"].percent | number:2}}%</td>
-                                        <td>{{profit[key]["deficit"].money| number:2}}</td>
+                                        <td>{{profit[key]["deficit"].money| number:2}} (CNY)</td>
                                     </tr>
 
                                 </table>

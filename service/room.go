@@ -62,7 +62,7 @@ func chatroom() {
 			models.NewArchive(event)
 
 			if event.Type == models.EVENT_MESSAGE {
-				beego.Info("type:", event.Type, "Message from", event.User, ";Content:", event.Content)
+				//beego.Info("type:", event.Type, "Message from", event.User, ";Content:", event.Content)
 			}
 		case unsub := <-unsubscribe:
 			for sub := subscribers.Front(); sub != nil; sub = sub.Next() {
