@@ -17,7 +17,8 @@ func Indexaddone(index int) (index1 int) {
 //默认启动
 func main() {
 
-	beego.AddFuncMap("indexaddone", Indexaddone) //模板中使用{{indexaddone $index}}或{{$index|indexaddone}}
+	//模板中使用{{indexaddone $index}}或{{$index|indexaddone}}
+	beego.AddFuncMap("indexaddone", Indexaddone)
 	beego.AddFuncMap("i18n", i18n.Tr)
 	//log记录设置
 	beego.SetLogger("file", `{"filename":"./logs/logs.log"}`)

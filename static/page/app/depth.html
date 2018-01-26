@@ -3,10 +3,11 @@
         <div class="col-md-8 pad-5" >
             <div data-slim-scroll data-scroll-height="{{height}}">
                 <div ng-repeat="(key, symbol) in depth ">
-                    <div class="col-md-4 pad-5" ng-if="settings.symbol[key].amount>0">
-                        <div class="panel panel-default " ng-class=" {'market-buy': settings.symbol[key].color} ">
+                    <div class="col-md-4 pad-5" ng-if="settings.Items.symbol[key].amount>0">
+                        <div class="panel panel-default " ng-class=" {'market-buy': settings.Items.symbol[key].color} ">
                             <div class="panel-heading">
-                                <h3 class="panel-title">{{key}}价格</h3>
+                                <h3 class="panel-title">{{key}}行情<div class="pull-right"> 数量：100个</div></h3>
+
                             </div>
                             <div class="panel-body pad-10 ">
                                 <table class="table table-striped">
@@ -95,7 +96,7 @@
 	                                            <label class="col-sm-4 control-label">火币</label>
 	                                            <div class="col-sm-8">
 	                                                <div class="input-group">
-	                                                    <input type="text" class="form-control" ng-model="settings.rate['1']"
+	                                                    <input type="number" class="form-control" ng-model="settings.Items.rate['1']"
 	                                                           placeholder="火币网"
 	                                                           ng-required="true">
 	                                                    <span class="input-group-addon">汇率</span>
@@ -108,7 +109,7 @@
 	                                            <label class="col-sm-4 control-label">韩币</label>
 	                                            <div class="col-sm-8">
 	                                                <div class="input-group">
-	                                                    <input type="text" class="form-control" ng-model="settings.rate['2']"
+	                                                    <input type="number" class="form-control" ng-model="settings.Items.rate['2']"
 	                                                           placeholder="韩币网"
 	                                                           ng-required="true">
 														<span class="input-group-addon">汇率</span>
@@ -124,7 +125,7 @@
 	                                            <label class="col-sm-4 control-label">模式</label>
 	                                            <div class="col-sm-8">
 	                                                <select class="form-control"
-	                                                        ng-model="settings.mode"
+	                                                        ng-model="settings.Items.mode"
 	                                                        ng-options="sel.Id as sel.Name for sel in select.mode">
 	                                                </select>
 	
@@ -136,7 +137,7 @@
 	                                            <label class="col-sm-4 control-label">下单</label>
 	                                            <div class="col-sm-8">
 	                                                <select class="form-control"
-	                                                        ng-model="settings.order"
+	                                                        ng-model="settings.Items.order"
 	                                                        ng-options="sel.Id as sel.Name for sel in select.order">
 	                                                </select>
 	                                            </div>
@@ -148,7 +149,7 @@
 	                                            <label class="col-sm-4 control-label">顺差</label>
 	                                            <div class="col-sm-8">
 	                                                <div class="input-group">
-	                                                    <input type="text" class="form-control" ng-model="settings.surplus"
+	                                                    <input type="number" class="form-control" ng-model="settings.Items.surplus"
 	                                                           placeholder="顺差"
 	                                                           ng-required="true">
 	                                                    <span class="input-group-addon">%</span>
@@ -161,7 +162,7 @@
 	                                            <label class="col-sm-4 control-label">逆差</label>
 	                                            <div class="col-sm-8">
 	                                                <div class="input-group">
-	                                                    <input type="text" class="form-control" ng-model="settings.deficit"
+	                                                    <input type="number" class="form-control" ng-model="settings.Items.deficit"
 	                                                           placeholder="逆差"
 	                                                           ng-required="true">
 	                                                    <span class="input-group-addon">%</span>
@@ -179,12 +180,12 @@
                             <tab heading="数量设置"   ng-click="active(2);">
                                 <form class="form-horizontal mt-10" role="form">
 
-                                    <div class="col-md-6" ng-repeat="(key, item) in settings.symbol">
+                                    <div class="col-md-6" ng-repeat="(key, item) in settings.Items.symbol">
                                         <div class="form-group">
                                             <label class="col-sm-4 control-label">{{key}}</label>
                                             <div class="col-sm-8">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control" ng-model="item.amount"
+                                                    <input type="number" class="form-control" ng-model="item.amount"
                                                            placeholder="{{key}}交易数量"
                                                            ng-required="true">
                                                     <span class="input-group-addon">个</span>
@@ -208,22 +209,33 @@
                                     <div data-slim-scroll data-scroll-height="201">
                                         <form class="form-horizontal" role="form">
                                             <table class="table table-striped">
-                                                <tr ng-repeat="(key, item) in settings.symbol">
+                                                <tr ng-repeat="(key, item) in settings.Items.symbol">
                                                     <td> {{key}}</td>
 
-                                                    <td><input type="text" class="form-control" ng-model="item.fee['1'][0]"
-                                                               placeholder="交易费"
-                                                               ng-required="true">
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <input type="number" class="form-control" ng-model="item.fee['1'][0]"
+                                                                   placeholder="交易费"
+                                                                   ng-required="true">
+                                                            <span class="input-group-addon">%</span>
+                                                        </div>
                                                     </td>
-                                                    <td><input type="text" class="form-control" ng-model="item.fee['1'][1]"
+                                                    <td>
+                                                        <input type="number" class="form-control" ng-model="item.fee['1'][1]"
                                                                placeholder="转账费"
-                                                               ng-required="true"></td>
-
-                                                    <td><input type="text" class="form-control" ng-model="item.fee['2'][0]"
-                                                               placeholder="交易费"
                                                                ng-required="true">
                                                     </td>
-                                                    <td><input type="text" class="form-control" ng-model="item.fee['2'][1]"
+
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <input type="number" class="form-control" ng-model="item.fee['2'][0]"
+                                                                   placeholder="交易费"
+                                                                   ng-required="true">
+                                                            <span class="input-group-addon">%</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="form-control" ng-model="item.fee['2'][1]"
                                                                placeholder="转账费"
                                                                ng-required="true">
                                                     </td>
@@ -256,7 +268,7 @@
                                                     <td width="30%">{{balance.Items.BithumbTrade["Money"] * 0.006 | number:2}} / {{balance.Items.BithumbFrozen["Money"]* 0.006 | number:2}}</td>
                                                     <td width="10%"><a ng-click="save();" class="btn btn-default btn-sm" >平衡</a></td>
                                                 </tr>
-                                                <tr ng-if="balance.Items.HuobiTrade[key]>0 || balance.Items.HuobiFrozen[key]>0 || balance.Items.BithumbTrade[key]>0 || balance.Items.BithumbFrozen[key]>0" ng-repeat="(key, item) in settings.symbol">
+                                                <tr ng-if="balance.Items.HuobiTrade[key]>0 || balance.Items.HuobiFrozen[key]>0 || balance.Items.BithumbTrade[key]>0 || balance.Items.BithumbFrozen[key]>0" ng-repeat="(key, item) in settings.Items.symbol">
                                                     <td width="30%"> {{key}}</td>
                                                     <td width="30%">{{balance.Items.HuobiTrade[key]}}/{{balance.Items.HuobiFrozen[key]}}</td>
                                                     <td width="30%">{{balance.Items.BithumbTrade[key]}}/{{balance.Items.BithumbFrozen[key]}}</td>
@@ -272,7 +284,7 @@
                     </div>
                     <div class="modal-footer" ng-if="tab!=0">
                         <div class="btn-group pull-right">
-                            <a ng-click="save();" class="btn btn-default btn-sm" ng-if="tab<4">保存</a>
+                            <a ng-click="settingsSave();" class="btn btn-default btn-sm" ng-if="tab<4">保存</a>
                             <a ng-click="getBalance();" class="btn btn-default btn-sm" ng-if="tab==4">刷新</a>
                         </div>
                     </div>

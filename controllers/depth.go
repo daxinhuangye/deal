@@ -106,14 +106,13 @@ func GetDepth(platform string, symbol string) {
 			if !service.GetDepthState() {
 				return
 			}
-			buy, sell, timestamp := obj.Depth(_symbol, 0)
+			bids, asks, timestamp := obj.Depth(_symbol, 0)
 
-			if buy != 0 && sell != 0 {
+			if bids != 0 && asks != 0 {
 
-				_buy := buy * huobi_rate
-				_sell := sell * huobi_rate
-				data := fmt.Sprintf(`{"symbol":"%s", "platform":1, "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
-
+				_bids := bids * huobi_rate
+				_asks := asks * huobi_rate
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":1, "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, bids, asks, _bids, _asks, timestamp)
 				service.Publish(0, data)
 			}
 
@@ -126,12 +125,12 @@ func GetDepth(platform string, symbol string) {
 			if !service.GetDepthState() {
 				return
 			}
-			buy, sell, timestamp := obj.Depth(symbol, 0)
+			bids, asks, timestamp := obj.Depth(symbol, 0)
 
-			if buy != 0 && sell != 0 {
-				_buy := buy * bithumb_rate
-				_sell := sell * bithumb_rate
-				data := fmt.Sprintf(`{"symbol":"%s", "platform":2, "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, buy, sell, _buy, _sell, timestamp)
+			if bids != 0 && asks != 0 {
+				_bids := bids * bithumb_rate
+				_asks := asks * bithumb_rate
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":2, "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, bids, asks, _bids, _asks, timestamp)
 				service.Publish(0, data)
 			}
 			time.Sleep(1 * time.Second)

@@ -1,4 +1,4 @@
-app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService",  "$timeout", "WebsocketService","BalanceService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService, $timeout, WebsocketService, BalanceService) {
+app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService",  "$timeout", "WebsocketService","BalanceService", "SettingsService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService, $timeout, WebsocketService, BalanceService, SettingsService) {
     $scope.height = $scope.windowHeight - 100;
 
 	//平台数据
@@ -73,32 +73,17 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 
 	//下拉配置
 	$scope.select = {
-		"mode":[{"Id":0, "Name":"买卖"}, {"Id":1, "Name":"卖买"}, {"Id":2, "Name":"同时"}],
-		"order":[{"Id":0, "Name":"手动"}, {"Id":1, "Name":"自动"}],
-		"type":[{"Id":0, "Name":"顺差"}, {"Id":1, "Name":"逆差"}],
+		"mode":[{"Id":1, "Name":"买卖"}, {"Id":2, "Name":"卖买"}, {"Id":3, "Name":"同时"}],
+		"order":[{"Id":1, "Name":"手动"}, {"Id":2, "Name":"自动"}],
+		"type":[{"Id":1, "Name":"顺差"}, {"Id":2, "Name":"逆差"}],
 	};
-	$scope.precision = 
+	//$scope.precision = 
 	//参数配置
-	$scope.settings = {
-		"rate" : {"1": 7, "2":0.006},
-		"surplus" : 15,
-		"deficit" : 5,
-		"mode":0,
-		"order":0,
-		"symbol":{
-			"BTC":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
-			"ETH":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
-			"DASH":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
-			"LTC":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
-			"ETC":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
-			"XRP":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
-			"BCH":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
-			"ZEC":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
-			"QTUM":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
-			"EOS":{"amount":10, "fee":{"1":[0.2, 0.001], "2":[0.2, 0.001]}, "color":false},
-		},
+	$scope.settings = SettingsService.data;
 
-
+	$scope.settingsSave = function(){
+		//console.log($scope.settings.Items);
+		SettingsService.save($scope.settings.Items);
 	};
 	//差值排序
 	$scope.sortList = [];
@@ -110,7 +95,7 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
             	break;
             }
         }
-        var data = {"symbol":symbol, "surplus":surplus, "deficit":deficit, "_deficit":Math.abs(deficit) };
+        var data = {"symbol":symbol, "surplus":surplus, "deficit":deficit};
         if(key>=0){
             $scope.sortList[key] = data;
 		}else{
@@ -124,13 +109,13 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 		var data = {
 			"index":index++,
 			"symbol":symbol,
-			"mode":$scope.settings.mode,
+			"mode":$scope.settings.Items.mode,
 			"buy":$scope.depth[symbol]['1']['_bids'],
 			"sell":$scope.depth[symbol]['2']['_asks'],
-			"amount": $scope.settings.symbol[symbol].amount,
+			"amount": $scope.settings.Items.symbol[symbol].amount,
 			"percent":$scope.profit[symbol]["surplus"]['percent'],
 			"money":$scope.profit[symbol]["surplus"]['money'],
-			"type":0
+			"type":1
 		};
 
 		if (type == 1) {
@@ -138,7 +123,7 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 			data['sell'] = $scope.depth[symbol]['1']['_asks'];
 			data['percent'] = $scope.profit[symbol]["deficit"]['percent'];
 			data['money'] = $scope.profit[symbol]["deficit"]['money'];
-			data['type'] = 1;
+			data['type'] = 2;
 		}
 
 		$scope.transactionList.push(data);
@@ -158,36 +143,51 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 	var index = 0;
 	$scope.$on('10000', function(event, data) {
 
-			var obj = angular.fromJson(data);
+		var obj = angular.fromJson(data);
 
-			//如果数量小于等于0 或者 买盘和卖盘都相等的话，直接返回
-			if ($scope.settings.symbol[obj.symbol].amount<=0 || (obj.bids == $scope.depth[obj.symbol][obj.platform].bids && obj.asks == $scope.depth[obj.symbol][obj.platform].asks) ){
-				return
-			}
-			$scope.depth[obj.symbol][obj.platform] = obj;
-			$scope.depth[obj.symbol][obj.platform]._asks =  $scope.depth[obj.symbol][obj.platform].asks * $scope.settings.rate[obj.platform];
-			$scope.depth[obj.symbol][obj.platform]._bids =  $scope.depth[obj.symbol][obj.platform].bids * $scope.settings.rate[obj.platform];
+		//如果数量小于等于0 或者 买盘和卖盘都相等的话，直接返回
+		if ($scope.settings.Items.symbol[obj.symbol].amount<=0 || (obj.bids == $scope.depth[obj.symbol][obj.platform].bids && obj.asks == $scope.depth[obj.symbol][obj.platform].asks) ){
+			return
+		}
+		$scope.depth[obj.symbol][obj.platform] = obj;
+		$scope.depth[obj.symbol][obj.platform]._bids =  $scope.depth[obj.symbol][obj.platform].bids * $scope.settings.Items.rate[obj.platform];
+		$scope.depth[obj.symbol][obj.platform]._asks =  $scope.depth[obj.symbol][obj.platform].asks * $scope.settings.Items.rate[obj.platform];
 
-			var huobi_bids = $scope.depth[obj.symbol]['1']['_bids'];
-			var huobi_asks = $scope.depth[obj.symbol]['1']['_asks'];
+		var huobi_bids = $scope.depth[obj.symbol]['1']['_bids'];
+		var huobi_asks = $scope.depth[obj.symbol]['1']['_asks'];
 
-			var bithumb_bids = $scope.depth[obj.symbol]['2']['_bids'];
-			var bithumb_asks = $scope.depth[obj.symbol]['2']['_asks'];
+		var bithumb_bids = $scope.depth[obj.symbol]['2']['_bids'];
+		var bithumb_asks = $scope.depth[obj.symbol]['2']['_asks'];
 
+		var huobi_bids_total = huobi_bids * $scope.settings.Items.symbol[obj.symbol].amount;
+		var huobi_asks_total = huobi_asks * $scope.settings.Items.symbol[obj.symbol].amount;
+		var bithumb_bids_total = bithumb_bids * $scope.settings.Items.symbol[obj.symbol].amount;
+		var bithumb_asks_total = bithumb_asks * $scope.settings.Items.symbol[obj.symbol].amount;
 
+		//计算交易费
+		var huobi_bids_fee = huobi_bids_total * ($scope.settings.Items.symbol[obj.symbol].fee["1"][0] / 100);
+		var huobi_asks_fee = huobi_asks_total * ($scope.settings.Items.symbol[obj.symbol].fee["1"][0] / 100);
+		var bithumb_bids_fee = bithumb_bids_total *($scope.settings.Items.symbol[obj.symbol].fee["2"][0] / 100);
+		var bithumb_asks_fee = bithumb_asks_total * ($scope.settings.Items.symbol[obj.symbol].fee["2"][0] / 100);
 
-			if(huobi_bids!=0 && huobi_bids !=0 && bithumb_bids!=0 && bithumb_asks!=0){
-				$scope.settings.symbol[obj.symbol].color = true;
+		//计算转账费
+		var huobi_transfer = huobi_asks * $scope.settings.Items.symbol[obj.symbol].fee["1"][1];
+		var bithumb_transfer = bithumb_asks * $scope.settings.Items.symbol[obj.symbol].fee["2"][1];
+
+		if(huobi_bids!=0 && huobi_bids !=0 && bithumb_bids!=0 && bithumb_asks!=0){
+				$scope.settings.Items.symbol[obj.symbol].color = true;
 				$timeout(function(){
-					$scope.settings.symbol[obj.symbol].color = false;
+					$scope.settings.Items.symbol[obj.symbol].color = false;
 					//return
 				},1000);
+
 				//顺差计算
-				$scope.profit[obj.symbol]["surplus"]['percent'] = ((bithumb_asks - huobi_bids  ) / huobi_bids) * 100;
-				$scope.profit[obj.symbol]["surplus"]['money'] = (bithumb_asks - huobi_bids ) * $scope.settings.symbol[obj.symbol].amount;
+				$scope.profit[obj.symbol]["surplus"]['money'] = bithumb_bids_total - huobi_asks_total - bithumb_bids_fee - huobi_asks_fee - huobi_transfer;
+				$scope.profit[obj.symbol]["surplus"]['percent'] = ($scope.profit[obj.symbol]["surplus"]['money'] / huobi_asks_total) * 100;
+
 				//逆差计算
-				$scope.profit[obj.symbol]["deficit"]['percent'] = ((huobi_asks - bithumb_bids  ) / bithumb_bids) * 100;
-				$scope.profit[obj.symbol]["deficit"]['money'] = (huobi_asks - bithumb_bids ) * $scope.settings.symbol[obj.symbol].amount;
+				$scope.profit[obj.symbol]["deficit"]['money'] = huobi_bids_total - bithumb_asks_total - huobi_bids_fee - bithumb_asks_fee - bithumb_transfer ;
+				$scope.profit[obj.symbol]["deficit"]['percent'] = ($scope.profit[obj.symbol]["deficit"]['money'] / bithumb_asks_total) * 100;
 
 				//放入排序队列
                 $scope.upSort(obj.symbol, $scope.profit[obj.symbol]["surplus"]['percent'], $scope.profit[obj.symbol]["deficit"]['percent']);
@@ -201,21 +201,21 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
                 var data = {
 	                "index":index++,
                     "symbol":obj.symbol,
-                    "mode":$scope.settings.mode,
-                    "buy":huobi_bids,
-                    "sell":bithumb_asks,
-                    "amount": $scope.settings.symbol[obj.symbol].amount,
+                    "mode":$scope.settings.Items.mode,
+                    "buy":huobi_asks,
+                    "sell":bithumb_bids,
+                    "amount": $scope.settings.Items.symbol[obj.symbol].amount,
                     "percent":$scope.profit[obj.symbol]["surplus"]['percent'],
                     "money":$scope.profit[obj.symbol]["surplus"]['money'],
-                    "type":0
+                    "type":1
                 };
 
                 if ($scope.profit[obj.symbol]["deficit"]['percent'] >= $scope["settings"].deficit) {
-                    data['buy'] = bithumb_bids;
-                    data['sell'] = huobi_asks;
+                    data['buy'] = bithumb_asks;
+                    data['sell'] = huobi_bids;
                     data['percent'] = $scope.profit[obj.symbol]["deficit"]['percent'];
                     data['money'] = $scope.profit[obj.symbol]["deficit"]['money'];
-                    data['type'] = 1;
+                    data['type'] = 2;
                 }
                 //添加到消息队列
                 $scope.message.push(data);

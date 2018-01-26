@@ -38,35 +38,17 @@ func (this *Bithumb) Depth(symbol string, num float64) (float64, float64, int64)
 		return 0, 0, 0
 	}
 
-	var total, buy, sell float64
 	//卖盘
-	asks := gjson.Get(content, "data.asks").Array()
-	for _, v := range asks {
-		total += v.Get("quantity").Float()
-		if total >= num {
-			buy = v.Get("price").Float()
-			break
-		}
-
-	}
-
-	total = 0
+	data := gjson.Get(content, "data.asks").Array()
+	asks := data[0].Get("price").Float()
 
 	//买盘
-	bids := gjson.Get(content, "data.bids").Array()
-
-	for _, v := range bids {
-		total += v.Get("quantity").Float()
-		if total >= num {
-			sell = v.Get("price").Float()
-			break
-		}
-
-	}
+	data = gjson.Get(content, "data.bids").Array()
+	bids := data[0].Get("price").Float()
 
 	ts := gjson.Get(content, "data.timestamp").Int()
 
-	return buy, sell, ts
+	return bids, asks, ts
 
 }
 
@@ -210,7 +192,7 @@ func (this *Bithumb) CancelWithdraw(address_id string) string {
 //签名计算
 func (this *Bithumb) createSign(hmac_data string) string {
 
-	hmh := hmac.New(sha512.New, []byte(beego.AppConfig.String("BithumbSecretKey")))
+	hmh := hmac.New(sha512.New, []byte(this.SecretKey))
 	hmh.Write([]byte(hmac_data))
 
 	hex_data := hex.EncodeToString(hmh.Sum(nil))
@@ -273,7 +255,7 @@ func (this *Bithumb) privateRequest(path string, key, value []string) string {
 	api_sign := this.createSign(hmac_data)
 
 	curl := httplib.Post(BT_HOST + path)
-	curl.Header("Api-Key", beego.AppConfig.String("BithumbAccessKey"))
+	curl.Header("Api-Key", this.AccessKey)
 	curl.Header("Api-Sign", api_sign)
 	curl.Header("Api-Nonce", api_nonce)
 	curl.Header("Content-Type", BT_CONTENTTYPE)

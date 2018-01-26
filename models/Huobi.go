@@ -35,6 +35,30 @@ const (
 	HB_AGENT       = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0"
 )
 
+//获取usdt汇率
+func (this *Huobi) GetRate() float64 {
+	api := "https://api-otc.huobi.pro/v1/otc/trade/list/public?coinId=2&tradeType=0&currentPage=1&payWay=&country=&merchant=1&online=1&range=0"
+	//创建链接
+	curl := httplib.Get(api)
+	//设置超时时间 2秒链接，3秒读数据
+	curl.SetTimeout(3*time.Second, 3*time.Second)
+
+	//获取请求的内容
+	temp, err := curl.Bytes()
+	if err != nil {
+		beego.Error(err)
+		return 0
+	}
+	content := string(temp)
+	status := gjson.Get(content, "code").Int()
+	if status != 200 {
+		return 0
+	}
+	data := gjson.Get(content, "data").Array()
+	return data[0].Get("price").Float()
+
+}
+
 //行情数据 btcusdt
 func (this *Huobi) Depth(symbol string, num float64) (float64, float64, int64) {
 
@@ -46,40 +70,23 @@ func (this *Huobi) Depth(symbol string, num float64) (float64, float64, int64) {
 		return 0, 0, 0
 	}
 
-	var total, buy, sell float64
-	//卖盘里算买入的钱
-	asks := gjson.Get(content, "tick.asks").Array()
-	for _, v := range asks {
-		temp := v.Array()
-		total += temp[1].Float()
-		if total >= num {
-			buy = temp[0].Float()
-			break
-		}
+	//卖盘
+	tick := gjson.Get(content, "tick.asks").Array()
+	temp := tick[0].Array()
+	asks := temp[0].Float()
 
-	}
+	//买盘
+	tick = gjson.Get(content, "tick.bids").Array()
+	temp = tick[0].Array()
+	bids := temp[0].Float()
 
-	total = 0
-
-	//买盘里算卖的钱
-	bids := gjson.Get(content, "tick.bids").Array()
-
-	for _, v := range bids {
-		temp := v.Array()
-		total += temp[1].Float()
-		if total >= num {
-			sell = temp[0].Float()
-			break
-		}
-
-	}
 	//时间
 	ts := gjson.Get(content, "tick.ts").Int()
-	return buy, sell, ts
+	return bids, asks, ts
 
 }
 
-//获取账户信息
+//获取参数信息
 func (this *Huobi) GetSymbols() string {
 	path := "/v1/common/symbols"
 	params := []string{}
@@ -270,13 +277,13 @@ func (this *Huobi) createSign(method, path string, params []string) string {
 	params = append(params, "SignatureMethod=HmacSHA256")
 	params = append(params, "SignatureVersion=2")
 	params = append(params, "Timestamp="+url.QueryEscape(tsTime.CurrSeUtcFormat("2006-01-02T15:04:05")))
-	params = append(params, "AccessKeyId="+beego.AppConfig.String("HuobiAccessKey"))
-
+	params = append(params, "AccessKeyId="+this.AccessKey)
+	beego.Trace(this.AccessKey)
 	sort.Strings(params)
 	str := strings.Join(params, "&")
 	temp := []string{method, HB_HOST, path, str}
 	hmac_data := strings.Join(temp, "\n")
-	hmh := hmac.New(sha256.New, []byte(beego.AppConfig.String("HuobiSecretKey")))
+	hmh := hmac.New(sha256.New, []byte(this.SecretKey))
 
 	hmh.Write([]byte(hmac_data))
 	hex_data := string(hmh.Sum(nil))

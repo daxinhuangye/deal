@@ -5,10 +5,10 @@ import (
 )
 
 type Settings struct {
-	Id     int64  // 编号
-	Uid    int64  // 用户id
-	Base   string // 基础配置
-	Symbol string // 币种配置
+	Id   int64  // 编号
+	Uid  int64  // 用户id
+	Data string // 基础数据
+	Time uint64 // 修改时间
 
 }
 
