@@ -4,8 +4,9 @@ import (
 	"Deal/models"
 	"Deal/service"
 	_ "fmt"
-	"github.com/astaxie/beego"
 	"tsEngine/tsDb"
+
+	"github.com/astaxie/beego"
 )
 
 type OrderController struct {
@@ -22,6 +23,7 @@ func (this *OrderController) List() {
 	db := tsDb.NewDbBase()
 	o := models.Order{}
 	list, _ := db.DbList(&o, "Uid", this.AdminId)
+	this.Code = 1
 	this.Result = list
 	this.TraceJson()
 

@@ -16,8 +16,8 @@
                                     <th>卖盘</th>
                                     <tr ng-repeat="item in symbol">
                                         <td>{{item.platform|arrayAttr:platform.Items:'Name'}}</td>
-                                        <td title="CNY:{{item._bids | number:2}}">{{item.bids | number:4}}</td>
-                                        <td title="CNY:{{item._asks | number:2}}">{{item.asks | number:4}}</td>
+                                        <td title="平台价格:{{item.bids | number:4}}">{{item._bids | number:2}}</td>
+                                        <td title="平台价格:{{item.asks | number:4}}">{{item._asks | number:2}}</td>
                                     </tr>
                                     <tr ng-class="{'text-danger':profit[key]['surplus'].percent >= percent}" title="{{profit[key]['surplus'].formula}}">
                                         <td>顺差：</td>
@@ -264,11 +264,12 @@
                                             <table class="table table-striped" >
                                                 <tr  ng-if="balance.Items.HuobiTrade['Money']>0 || balance.Items.HuobiFrozen['Money']>0 || balance.Items.BithumbTrade['Money']>0 || balance.Items.BithumbFrozen['Money']>0">
                                                     <td width="30%">现金(CNY)</td>
-                                                    <td width="30%">{{balance.Items.HuobiTrade["Money"] * 7 | number:2}} / {{balance.Items.HuobiFrozen["Money"] * 7 | number:2}}</td>
-                                                    <td width="30%">{{balance.Items.BithumbTrade["Money"] * 0.006 | number:2}} / {{balance.Items.BithumbFrozen["Money"]* 0.006 | number:2}}</td>
+                                                    <td width="30%">{{balance.Items.HuobiTrade["Money"] * settings.Items.rate[1] | number:2}} / {{balance.Items.HuobiFrozen["Money"] * settings.Items.rate[1] | number:2}}</td>
+                                                    <td width="30%">{{balance.Items.BithumbTrade["Money"] * settings.Items.rate[2] | number:2}} / {{balance.Items.BithumbFrozen["Money"]* settings.Items.rate[2] | number:2}}</td>
                                                     <td width="10%"><a ng-click="save();" class="btn btn-default btn-sm" >平衡</a></td>
                                                 </tr>
-                                                <tr ng-if="balance.Items.HuobiTrade[key]>0 || balance.Items.HuobiFrozen[key]>0 || balance.Items.BithumbTrade[key]>0 || balance.Items.BithumbFrozen[key]>0" ng-repeat="(key, item) in settings.Items.symbol">
+                                               <!-- <tr ng-if="balance.Items.HuobiTrade[key]>0 || balance.Items.HuobiFrozen[key]>0 || balance.Items.BithumbTrade[key]>0 || balance.Items.BithumbFrozen[key]>0" ng-repeat="(key, item) in settings.Items.symbol">-->
+                                                <tr  ng-repeat="(key, item) in settings.Items.symbol">
                                                     <td width="30%"> {{key}}</td>
                                                     <td width="30%">{{balance.Items.HuobiTrade[key]}}/{{balance.Items.HuobiFrozen[key]}}</td>
                                                     <td width="30%">{{balance.Items.BithumbTrade[key]}}/{{balance.Items.BithumbFrozen[key]}}</td>
@@ -302,26 +303,24 @@
                         <table class="table table-striped mb-5">
                             <th width="10%">模式</th>
                             <th width="10%">类型</th>
-                            <th>买价</th>
-                            <th>卖价</th>
-                            <th>数量</th>
-                            <th>赢利</th>
-                            <th>金钱</th>
+                            <th width="10%">币种</th>
+                            <th width="20%">买价</th>
+                            <th width="20%">卖价</th>
+                            <th width="15%">数量</th>
                             <th>状态</th>
                         </table>
                         <div data-slim-scroll data-scroll-height="100">
                             <table class="table table-striped">
-                                <tr ng-repeat="(key, item) in transactionList">
-                                    <td width="10%">{{item.mode|arrayAttr:select.mode:'Name'}}</td>
-                                    <td width="10%">{{item.type|arrayAttr:select.type:'Name'}}</td>
-                                    <td>{{item.buy| number:2}}</td>
-                                    <td>{{item.sell| number:2}}</td>
-                                    <td>{{item.amount}}</td>
-                                    <td>{{item.percent| number:2}}%</td>
-                                    <td>{{item.money| number:2}}</td>
-                                    <td ng-if="item.state==1">交易中</td>
-                                    <td ng-if="item.state==2">交易中</td>
-                                    <td ng-if="item.state==3">交易中</td>
+                                <tr ng-repeat="(key, item) in order.Items">
+                                    <td width="10%">{{item.Mode|arrayAttr:select.mode:'Name'}}</td>
+                                    <td width="10%">{{item.Type|arrayAttr:select.type:'Name'}}</td>
+                                    <td width="10%">{{item.Currency}}</td>
+                                    <td width="20%">{{item.Buy| number:2}}</td>
+                                    <td width="20%">{{item.Sell| number:2}}</td>
+                                    <td width="15%">{{item.Amount}}</td>
+                                    <td ng-if="item.State==1">交易中</td>
+                                    <td ng-if="item.State==2">交易中</td>
+                                    <td ng-if="item.State==3">交易中</td>
                                 </tr>
 
                             </table>

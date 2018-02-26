@@ -4,10 +4,15 @@ app.service('WebsocketService', ['$rootScope', function($rootScope) {
     var ws = null;
 	var conn = false;
 	var reconn = false;
-	
-	//默认连接服务器
-	connectServer();
-   
+
+	setTimeout(function () {
+		console.log("开始连接");
+    	//默认连接服务器
+		connectServer();
+    }, 1000);
+
+
+
 
 	function connectServer(){
 	 	ws = new WebSocket("ws://" + weburl + "/depth/join");

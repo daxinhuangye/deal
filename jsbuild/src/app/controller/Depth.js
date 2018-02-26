@@ -1,4 +1,4 @@
-app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService",  "$timeout", "WebsocketService","BalanceService", "SettingsService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService, $timeout, WebsocketService, BalanceService, SettingsService) {
+app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService",  "$timeout", "WebsocketService","BalanceService", "SettingsService","OrderService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService, $timeout, WebsocketService, BalanceService, SettingsService, OrderService) {
     $scope.height = $scope.windowHeight - 100;
 
 	//平台数据
@@ -10,6 +10,9 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
         BalanceService.getData();
     };
 
+	//订单列表
+	$scope.order = OrderService.data;
+
 	$scope.tab = 0;
 	$scope.active = function(tab) {
         $scope.tab = tab;
@@ -19,42 +22,52 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 		"BTC":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		},
 		"ETH":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		},
 		"DASH":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		},
 		"LTC":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		},
 		"ETC":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		},
 		"XRP":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		},
 		"BCH":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		},
 		"ZEC":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		},
 		"QTUM":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		},
 		"EOS":{
 			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		}
 	};
 	//盈利数据
@@ -143,16 +156,25 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 	var index = 0;
 	$scope.$on('10000', function(event, data) {
 
+		
 		var obj = angular.fromJson(data);
 
 		//如果数量小于等于0 或者 买盘和卖盘都相等的话，直接返回
 		if ($scope.settings.Items.symbol[obj.symbol].amount<=0 || (obj.bids == $scope.depth[obj.symbol][obj.platform].bids && obj.asks == $scope.depth[obj.symbol][obj.platform].asks) ){
 			return
 		}
+
+		
 		$scope.depth[obj.symbol][obj.platform] = obj;
 		$scope.depth[obj.symbol][obj.platform]._bids =  $scope.depth[obj.symbol][obj.platform].bids * $scope.settings.Items.rate[obj.platform];
 		$scope.depth[obj.symbol][obj.platform]._asks =  $scope.depth[obj.symbol][obj.platform].asks * $scope.settings.Items.rate[obj.platform];
+		
+		for (i in $scope.depth[obj.symbol] ) {
 
+			for (i in $scope.depth[obj.symbol] ) {
+				//console.log( $scope.depth[obj.symbol][i]);
+			}
+		}
 		var huobi_bids = $scope.depth[obj.symbol]['1']['_bids'];
 		var huobi_asks = $scope.depth[obj.symbol]['1']['_asks'];
 
@@ -173,9 +195,7 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 		//计算转账费
 		var huobi_transfer = huobi_asks * $scope.settings.Items.symbol[obj.symbol].fee["1"][1];
 		var bithumb_transfer = bithumb_asks * $scope.settings.Items.symbol[obj.symbol].fee["2"][1];
-		if(obj.symbol == "XRP") {
-			console.log("火币买单价：",huobi_bids, "火币总额：", huobi_bids_total, "交易费：", huobi_bids_fee, "转账费用：", huobi_transfer);
-		}
+
 		if(huobi_bids!=0 && huobi_bids !=0 && bithumb_bids!=0 && bithumb_asks!=0){
 				$scope.settings.Items.symbol[obj.symbol].color = true;
 				$timeout(function(){

@@ -1,23 +1,25 @@
 package models
 
 import (
-	"github.com/astaxie/beego/orm"
 	"tsEngine/tsPagination"
+
+	"github.com/astaxie/beego/orm"
 )
 
 //订单表模型
 type Order struct {
-	Id      int64
-	Uid     int64
-	OrderId string
-	Pid     float64
-	Amount  string
-	buy     string
-	sell    string
-	Symbol  string
-	Type    string
-	Time    string
-	State   int64
+	Id       int64
+	Uid      int64
+	OrderId  string
+	Pid      float64
+	Amount   string
+	Buy      string
+	Sell     string
+	Currency string
+	Type     string
+	Mode     int64
+	Time     string
+	State    int64
 }
 
 func init() {

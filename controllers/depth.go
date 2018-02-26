@@ -36,6 +36,7 @@ func (this *DepthController) Start() {
 
 	for _, v := range symbol_list {
 		go GetDepth("huobi", v["Symbol"].(string))
+		go GetDepth("binance", v["Symbol"].(string))
 		go GetDepth("bithumb", v["Symbol"].(string))
 	}
 
@@ -54,6 +55,7 @@ func (this *DepthController) End() {
 
 	for _, v := range symbol_list {
 		go GetDepth("huobi", v["Symbol"].(string))
+		go GetDepth("binance", v["Symbol"].(string))
 		go GetDepth("bithumb", v["Symbol"].(string))
 	}
 
@@ -116,7 +118,27 @@ func GetDepth(platform string, symbol string) {
 				service.Publish(0, data)
 			}
 
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(500 * time.Millisecond)
+		}
+
+	case "binance":
+		obj := models.Binance{}
+		_symbol := symbol + "USDT"
+		for {
+			if !service.GetDepthState() {
+				return
+			}
+			bids, asks, timestamp := obj.Depth(_symbol, 0)
+
+			if bids != 0 && asks != 0 {
+
+				_bids := bids * huobi_rate
+				_asks := asks * huobi_rate
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":3, "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, bids, asks, _bids, _asks, timestamp)
+				service.Publish(0, data)
+			}
+
+			time.Sleep(500 * time.Millisecond)
 		}
 
 	case "bithumb":
@@ -133,7 +155,7 @@ func GetDepth(platform string, symbol string) {
 				data := fmt.Sprintf(`{"symbol":"%s", "platform":2, "bids":%f, "asks":%f, "_bids":%f, "_asks":%f, "time":%d}`, symbol, bids, asks, _bids, _asks, timestamp)
 				service.Publish(0, data)
 			}
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(500 * time.Millisecond)
 
 		}
 	}

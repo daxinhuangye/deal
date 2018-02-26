@@ -19,24 +19,24 @@ import (
 )
 
 //火币api接口
-type Huobi struct {
+type Binance struct {
 	AccessKey string //appid
 	SecretKey string //秘钥
 	AccountId string
 }
 
-//火币api接口
+//币安api接口
 
 const (
-	HB_HOST        = "api.huobi.pro"
-	HB_CONTENTTYPE = "application/x-www-form-urlencoded"
-	HB_ACCEPT      = "application/json"
-	HB_LANGUAGE    = "zh-CN"
-	HB_AGENT       = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0"
+	BA_HOST        = "www.binance.com"
+	BA_CONTENTTYPE = "application/x-www-form-urlencoded"
+	BA_ACCEPT      = "application/json"
+	BA_LANGUAGE    = "zh-CN"
+	BA_AGENT       = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0"
 )
 
 //获取usdt汇率
-func (this *Huobi) GetRate() float64 {
+func (this *Binance) GetRate() float64 {
 	api := "https://api-otc.huobi.pro/v1/otc/trade/list/public?coinId=2&tradeType=0&currentPage=1&payWay=&country=&merchant=1&online=1&range=0"
 	//创建链接
 	curl := httplib.Get(api)
@@ -60,32 +60,34 @@ func (this *Huobi) GetRate() float64 {
 }
 
 //行情数据 btcusdt
-func (this *Huobi) Depth(symbol string, num float64) (float64, float64, int64) {
+func (this *Binance) Depth(symbol string, num float64) (float64, float64, int64) {
 
-	api := "https://" + HB_HOST + "/market/depth?type=step0&symbol=" + symbol
+	api := "https://" + BA_HOST + "/api/v1/depth?symbol=" + symbol + "&limit=5"
+	beego.Trace(api)
 	content := this.request(api)
 	if content == "" {
 		return 0, 0, 0
 	}
 
 	//卖盘
-	tick := gjson.Get(content, "tick.asks").Array()
+	tick := gjson.Get(content, "asks").Array()
 	temp := tick[0].Array()
 	asks := temp[0].Float()
 
 	//买盘
-	tick = gjson.Get(content, "tick.bids").Array()
+	tick = gjson.Get(content, "bids").Array()
 	temp = tick[0].Array()
 	bids := temp[0].Float()
 
 	//时间
-	ts := gjson.Get(content, "tick.ts").Int()
+	ts := gjson.Get(content, "lastUpdateId").Int()
+	beego.Trace("数据：", bids, asks, ts)
 	return bids, asks, ts
 
 }
 
 //获取参数信息
-func (this *Huobi) GetSymbols() string {
+func (this *Binance) GetSymbols() string {
 	path := "/v1/common/symbols"
 	params := []string{}
 	api := "https://" + HB_HOST + path + "?" + this.createSign("GET", path, params)
@@ -95,7 +97,7 @@ func (this *Huobi) GetSymbols() string {
 }
 
 //获取账户信息
-func (this *Huobi) GetAccounts() string {
+func (this *Binance) GetAccounts() string {
 	if this.AccountId != "" {
 		return this.AccountId
 	}
@@ -108,7 +110,7 @@ func (this *Huobi) GetAccounts() string {
 }
 
 //获取资产
-func (this *Huobi) GetBalance() (map[string]float64, map[string]float64) {
+func (this *Binance) GetBalance() (map[string]float64, map[string]float64) {
 
 	account_id := beego.AppConfig.String("HuobiAccountId")
 
@@ -145,13 +147,13 @@ func (this *Huobi) GetBalance() (map[string]float64, map[string]float64) {
 }
 
 //获取钱包地址
-func (this *Huobi) GetWalletAddress() string {
+func (this *Binance) GetWalletAddress() string {
 	wallet_address := beego.AppConfig.String("HuobiWalletAddress")
 	return wallet_address
 }
 
 //获取订单列表
-func (this *Huobi) GetOrders(symbol, types, start_date, end_date, states, from, direct, size string) string {
+func (this *Binance) GetOrders(symbol, types, start_date, end_date, states, from, direct, size string) string {
 
 	path := "/v1/order/orders"
 
@@ -164,7 +166,7 @@ func (this *Huobi) GetOrders(symbol, types, start_date, end_date, states, from, 
 }
 
 //创建订单
-func (this *Huobi) CreateOrder(price, amount float64, symbol, _type string, PricePrecision, AmountPrecision int64) string {
+func (this *Binance) CreateOrder(price, amount float64, symbol, _type string, PricePrecision, AmountPrecision int64) string {
 
 	var postData struct {
 		AccountId string `json:"account-id"`
@@ -200,7 +202,7 @@ func (this *Huobi) CreateOrder(price, amount float64, symbol, _type string, Pric
 }
 
 //申请取消订单
-func (this *Huobi) CancelOrder(order_id string) string {
+func (this *Binance) CancelOrder(order_id string) string {
 	//定义匿名数据结构
 	var postData struct {
 		OrderId string `json:"data"`
@@ -221,7 +223,7 @@ func (this *Huobi) CancelOrder(order_id string) string {
 }
 
 //订单信息
-func (this *Huobi) OrderInfo(order_id string) string {
+func (this *Binance) OrderInfo(order_id string) string {
 	params := []string{}
 	path := fmt.Sprintf("/v1/order/orders/%s", order_id)
 
@@ -238,7 +240,7 @@ func (this *Huobi) OrderInfo(order_id string) string {
 }
 
 //订单是否成交
-func (this *Huobi) OrderDeal(order_id string) bool {
+func (this *Binance) OrderDeal(order_id string) bool {
 	for {
 		if this.OrderInfo(order_id) == "filled" {
 			return true
@@ -249,7 +251,7 @@ func (this *Huobi) OrderDeal(order_id string) bool {
 }
 
 //虚拟币提现
-func (this *Huobi) GetWithdraw(address_id, amount, currency, fee, addr_tag string) string {
+func (this *Binance) GetWithdraw(address_id, amount, currency, fee, addr_tag string) string {
 	/*
 		post_key := []string{"address_id", "amount", "currency", "fee", "addr-tag"}
 		post_value := []string{address_id, amount, currency, fee, addr_tag}
@@ -260,7 +262,7 @@ func (this *Huobi) GetWithdraw(address_id, amount, currency, fee, addr_tag strin
 }
 
 //取消提现
-func (this *Huobi) CancelWithdraw(address_id string) string {
+func (this *Binance) CancelWithdraw(address_id string) string {
 	/*
 		path := fmt.Sprintf("/v1/dw/withdraw-virtual/%s/cancel", address_id)
 		return this.keyPost(path, []string{}, []string{})
@@ -270,7 +272,7 @@ func (this *Huobi) CancelWithdraw(address_id string) string {
 }
 
 //签名计算
-func (this *Huobi) createSign(method, path string, params []string) string {
+func (this *Binance) createSign(method, path string, params []string) string {
 
 	params = append(params, "SignatureMethod=HmacSHA256")
 	params = append(params, "SignatureVersion=2")
@@ -296,7 +298,7 @@ func (this *Huobi) createSign(method, path string, params []string) string {
 }
 
 //网络请求
-func (this *Huobi) request(api string, fields ...interface{}) string {
+func (this *Binance) request(api string, fields ...interface{}) string {
 
 	//创建链接
 	curl := httplib.Get(api)
@@ -306,9 +308,9 @@ func (this *Huobi) request(api string, fields ...interface{}) string {
 		curl.JSONBody(fields[0])
 	}
 
-	curl.Header("Accept", HB_ACCEPT)
-	curl.Header("User-Agent", HB_AGENT)
-	curl.Header("Accept-Language", HB_LANGUAGE)
+	//curl.Header("Accept", HB_ACCEPT)
+	//curl.Header("User-Agent", HB_AGENT)
+	//curl.Header("Accept-Language", HB_LANGUAGE)
 	//设置超时时间 2秒链接，3秒读数据
 	curl.SetTimeout(5*time.Second, 5*time.Second)
 
@@ -319,9 +321,10 @@ func (this *Huobi) request(api string, fields ...interface{}) string {
 		return ""
 	}
 	content := string(temp)
-	status := gjson.Get(content, "status").String()
-	if status != "ok" {
-		err_msg := gjson.Get(content, "err-msg").String()
+	status := gjson.Get(content, "code").Int()
+
+	if status != 0 {
+		err_msg := gjson.Get(content, "msg").String()
 		beego.Error(err_msg)
 		return ""
 	}
