@@ -42,10 +42,11 @@ func main() {
 	go depth.HuobiRun()
 	go depth.BinanceRun()
 	go depth.ZbRun()
-
+	go depth.OkexRun()
+	go depth.DepthRun()
 	//go depth.BithumbRun()
 	//go depth.KorbitRun()
-	go depth.DepthRun()
+	//go depth.DepthRun()
 	//go depth.CoinoneRun()
 
 	//go depth.OkexRun()

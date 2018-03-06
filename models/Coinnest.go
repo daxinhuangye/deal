@@ -27,7 +27,6 @@ const (
 func (this *Coinnest) Depth(symbol string, num float64) (float64, float64, int64) {
 
 	api := "https://" + CN_HOST + "/api/pub/depth?coin=" + symbol
-	beego.Trace(api)
 	content, err := this.request(api)
 	if err != nil {
 		//停2秒再去获取

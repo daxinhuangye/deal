@@ -259,7 +259,34 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 		
 	};
 	
-	
+
+	//音效播放
+ 	$scope.playing = false;
+
+    $scope.audio = document.createElement('audio');
+
+    $scope.play = function() {	
+		if(!$scope.playing) {
+			$scope.audio.src = '/static/sound/warning.wav';
+			$scope.audio.play(); 
+			$scope.playing = true;
+		}	
+		
+    };
+
+    $scope.stop = function() {
+		$scope.playId = 0;
+        $scope.audio.pause();
+        $scope.playing = false;
+    };
+
+   $scope.audio.addEventListener('ended', function() {
+        $scope.$apply(function() {
+            $scope.stop()
+        });
+    });
+/////////////////////////////
+
 	$scope.message = [];
 	var index = 0;
 	$scope.$on('10000', function(event, data) {
@@ -272,6 +299,10 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 		obj._asks = $scope.settings.Items.rate[obj.platform] >0 ? obj.asks * $scope.settings.Items.rate[obj.platform] : obj.asks;
 
 		//如果数量小于等于0 或者 买盘和卖盘都相等的话，直接返回
+		if($scope.settings.Items.symbol[obj.platform][obj.symbol].amount <=0 ){
+			return
+		}
+		//如果买盘和卖盘和原始数据都相等的话，直接返回
 		if (obj.bids == $scope.depth[obj.platform][obj.symbol].bids && obj.asks == $scope.depth[obj.platform][obj.symbol].asks) {
 			return
 		}
@@ -295,9 +326,10 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 		//总价计算
 		var A_bids_total = A_bids * $scope.settings.Items.symbol[obj.platform][obj.symbol].amount;
 		var A_asks_total = A_asks * $scope.settings.Items.symbol[obj.platform][obj.symbol].amount;
+
 		//计算交易费
-		var A_bids_fee = A_bids_total * ($scope.settings.Items.symbol[obj.platform][obj.symbol].fee / 100);
-		var A_asks_fee = A_asks_total * ($scope.settings.Items.symbol[obj.platform][obj.symbol].fee / 100);
+		var A_bids_fee = A_bids_total * ($scope.settings.Items.symbol[obj.platform][obj.symbol].fee );
+		var A_asks_fee = A_asks_total * ($scope.settings.Items.symbol[obj.platform][obj.symbol].fee );
 
 		//计算转账费
 		var A_transfer = A_asks * $scope.settings.Items.symbol[obj.platform][obj.symbol].transfer;
@@ -312,13 +344,16 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 
 			var B_bids = $scope.depth[$scope.platform.Items[i].Id][obj.symbol]._bids;
 			var B_asks = $scope.depth[$scope.platform.Items[i].Id][obj.symbol]._asks;
+			if (B_bids <= 0 || B_asks <= 0){
+				continue;
+			}
 
-			var B_bids_total = B_bids * $scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].amount;
-			var B_asks_total = B_asks * $scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].amount;
+			var B_bids_total = B_bids * $scope.settings.Items.symbol[obj.platform][obj.symbol].amount;//$scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].amount;
+			var B_asks_total = B_asks * $scope.settings.Items.symbol[obj.platform][obj.symbol].amount;//$scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].amount;
 
 			//计算交易费
-			var B_bids_fee = B_bids_total * ($scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].fee / 100);
-			var B_asks_fee = B_asks_total * ($scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].fee / 100);
+			var B_bids_fee = B_bids_total * ($scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].fee);
+			var B_asks_fee = B_asks_total * ($scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].fee);
 
 			//计算转账费
 			var B_transfer = B_asks * $scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].transfer;
@@ -334,8 +369,13 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 			var B_percent = (B_money / B_asks_total) * 100;
 			//$scope.profit[obj.symbol]["deficit"]['formula'] = huobi_bids_total +"-"+ bithumb_asks_total +"-"+ huobi_bids_fee +"-"+ bithumb_asks_fee +"-"+ bithumb_transfer ;
 			//console.log(B_percent);
+			
+			if (A_percent>=$scope.settings.Items.surplus || B_percent>=$scope.settings.Items.surplus) {
 
-			var push_data = {
+				$scope.play();
+			}
+
+			var push_data1 = {
 				"key":obj.symbol + "-" + obj.platform + "-" +$scope.platform.Items[i].Id,
 				"symbol":obj.symbol,
 				"platformA": obj.platform,
@@ -347,9 +387,10 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 				"timestamp": Date.parse( new Date()),
 				"msg":""
 			} ;
-			$scope.upSort(push_data);
 
-			var push_data = {
+			$scope.upSort(push_data1);
+
+			var push_data2 = {
 				"key":obj.symbol + "-" + $scope.platform.Items[i].Id + "-" + obj.platform ,
 				"symbol":obj.symbol,
 				"platformA": $scope.platform.Items[i].Id,
@@ -361,8 +402,10 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 				"timestamp": Date.parse( new Date()),
 				"msg":""
 			} ;
-			$scope.upSort(push_data);
 
+			$scope.upSort(push_data2);
+
+			
 			
 		}
 
@@ -375,6 +418,7 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 
 
 	});
+
 	
 
 }]);

@@ -89,7 +89,7 @@ func (this *BaseController) CheckLogin(redirect ...bool) {
 func (this *BaseController) CheckPermission() {
 
 	params := strings.Split(strings.ToLower(this.Ctx.Request.RequestURI), "/")
-
+	beego.Trace("参数：", params)
 	//登录校验
 	this.CheckLogin()
 	//如果是开发者直接返回
@@ -124,9 +124,10 @@ func (this *BaseController) CheckPermission() {
 		this.TraceJson()
 	}
 	pass := 0
-	mode := params[len(params)-2]
-	function := params[len(params)-1]
+	mode := params[0]
+	function := params[1]
 
+	beego.Trace("执行方法：", mode, function)
 	for _, v := range list {
 
 		permission := v["Permission"].(string)

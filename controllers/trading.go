@@ -4,7 +4,8 @@ import (
 	"Deal/models"
 
 	_ "fmt"
-	"tsEngine/tsDb"
+
+	"github.com/astaxie/beego"
 
 	"tsEngine/tsTime"
 )
@@ -20,19 +21,25 @@ func (this *TradingController) Prepare() {
 
 //获取订单列表
 func (this *TradingController) List() {
-	symbol := this.GetString("symbol")
-	period := this.GetString("period")
-
-	db := tsDb.NewDbBase()
 	o := models.Trading{}
+	o.Symbol = this.GetString("symbol")
+	o.Period = this.GetString("period")
 
-	order := []string{"tick_id"}
+	Page := int64(1) //this.GetInt64("Page")
+	PageSize, _ := this.GetInt64("size")
 
-	list, _ := db.DbListOrder(&o, order, "Symbol", symbol, "Period", period)
+	items, _, err := o.List(Page, PageSize)
+
+	if err != nil {
+		beego.Error(err)
+		this.Code = 0
+		this.Msg = "数据库异常错误，请联系管理员"
+		this.TraceJson()
+	}
 
 	ts := tsTime.CurrMs()
 	this.Code = 1
-	this.Result = map[string]interface{}{"symbol": symbol, "timestamp": ts, "data": list}
+	this.Result = map[string]interface{}{"symbol": o.Symbol, "timestamp": ts, "data": items}
 	this.TraceJson()
 
 }

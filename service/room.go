@@ -97,6 +97,7 @@ func isUserExist(subscribers *list.List, user int64) bool {
 
 //广播消息
 func broadcastWebSocket(event models.Event) {
+	//beego.Trace("开始广播消息")
 	data, err := json.Marshal(event)
 	if err != nil {
 		beego.Error("Fail to marshal event:", err)
@@ -143,5 +144,6 @@ func Leave(user int64) {
 }
 
 func Publish(userId int64, data string) {
+	//beego.Trace("消息：", data)
 	publish <- newEvent(models.EVENT_MESSAGE, userId, data)
 }

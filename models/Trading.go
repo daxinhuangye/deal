@@ -1,7 +1,7 @@
 package models
 
 import (
-	_ "tsEngine/tsPagination"
+	"tsEngine/tsPagination"
 
 	"github.com/astaxie/beego/orm"
 )
@@ -27,4 +27,30 @@ func init() {
 
 func (this *Trading) TableName() string {
 	return "data_trading"
+}
+
+func (this *Trading) List(page int64, page_size int64) (data []orm.Params, pagination *tsPagination.Pagination, err error) {
+
+	op := orm.NewOrm().QueryTable(this)
+
+	if this.Symbol != "" {
+		op = op.Filter("Symbol", this.Symbol)
+	}
+
+	if this.Period != "" {
+		op = op.Filter("Period", this.Period)
+	}
+
+	count, _ := op.Count()
+
+	pagination = tsPagination.NewPagination(page, page_size, count)
+
+	op = op.Limit(page_size, pagination.GetOffset())
+
+	op = op.OrderBy("TickId")
+
+	_, err = op.Values(&data)
+
+	return data, pagination, err
+
 }

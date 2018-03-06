@@ -23,30 +23,30 @@ func init() {
 	beego.Router("/", &admin.IndexController{})
 
 	// 登录
-	beego.AutoPrefix("admin", &admin.LoginController{})
+	beego.AutoRouter(&admin.LoginController{})
 
 	// 节点
-	beego.AutoPrefix("admin", &admin.NodeController{})
+	beego.AutoRouter(&admin.NodeController{})
 
 	// 模块管理
-	beego.AutoPrefix("admin", &admin.ModeController{})
+	beego.AutoRouter(&admin.ModeController{})
 
 	// 管理员
-	beego.AutoPrefix("admin", &admin.AdminController{})
+	beego.AutoRouter(&admin.AdminController{})
 
 	// 角色
-	beego.AutoPrefix("admin", &admin.RoleController{})
+	beego.AutoRouter(&admin.RoleController{})
 
 	// ip屏蔽
-	beego.AutoPrefix("admin", &admin.IpbanController{})
+	beego.AutoRouter(&admin.IpbanController{})
 
 	// 日志
-	beego.AutoPrefix("admin", &admin.LogsController{})
+	beego.AutoRouter(&admin.LogsController{})
 
 	//公共
-	beego.AutoPrefix("admin", &admin.PublicController{})
+	beego.AutoRouter(&admin.PublicController{})
 
 	//Uedit富文本编辑器
-	beego.AutoPrefix("admin", &admin.UeditorController{})
+	beego.AutoRouter(&admin.UeditorController{})
 
 }
