@@ -5,7 +5,10 @@ app.config( ["$routeProvider", function ($routeProvider) {
 		templateUrl: '/static/page/app/depth.html',
 		controller: "DepthCtrl"
 	});
-
+	$routeProvider.when('/quanti', {
+		templateUrl: '/static/page/app/quanti.html',
+		controller: "QuantiCtrl"
+	});
 	$routeProvider.when('/secret/list', {
 		templateUrl: '/static/page/app/secret_list.html',
 		controller: "SecretListCtrl"
@@ -19,11 +22,14 @@ app.config( ["$routeProvider", function ($routeProvider) {
 }]);
 
 ;
-app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService",  "$timeout", "WebsocketService","BalanceService", "SettingsService","OrderService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService, $timeout, WebsocketService, BalanceService, SettingsService, OrderService) {
-    $scope.height = $scope.windowHeight - 100;
+app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService", "SymbolService", "$timeout", "WebsocketService","BalanceService", "SettingsService","OrderService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService, SymbolService, $timeout, WebsocketService, BalanceService, SettingsService, OrderService) {
+    $scope.height = $scope.windowHeight - 90;
 
 	//平台数据
 	$scope.platform = PlatformService.data;
+	//币种数据
+	$scope.symbol = SymbolService.data;
+
 	//资产状态
 	$scope.balance = BalanceService.data;
 	//更新资产状况
@@ -38,71 +44,166 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 	$scope.active = function(tab) {
         $scope.tab = tab;
 	};
-	//行情数据
-	$scope.depth = {
-		"BTC":{
-			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-		},
-		"ETH":{
-			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-		},
-		"DASH":{
-			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-		},
-		"LTC":{
-			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-		},
-		"ETC":{
-			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-		},
-		"XRP":{
-			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-		},
-		"BCH":{
-			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-		},
-		"ZEC":{
-			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-		},
-		"QTUM":{
-			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-		},
-		"EOS":{
-			"1":{"platform":1, "bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"2":{"platform":2,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
-			"3":{"platform":3,"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+
+	
+
+	$scope.depth2 = {
+		"BTC":[],
+		"ETH":[],
+		"DASH":[],
+		"LTC":[],
+		"ETC":[],
+		"XRP":[],
+		"BCH":[],
+		"ZEC":[],
+		"QTUM":[],
+		"EOS":[]
+	};
+
+	$scope.upDepth2 = function(data ){
+        var key=-1;
+		for (var i=0; i<$scope.depth2[data.symbol].length; i++) {
+            if ($scope.depth2[data.symbol][i].platform == data.platform) {
+            	key = i;
+            	break;
+            }
+        }
+		if (key >-1) {
+			$scope.depth2[data.symbol][key] = data;
+		}else{
+			$scope.depth2[data.symbol].push(data)
 		}
 	};
-	//盈利数据
-	$scope.profit = {
-		"BTC":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
-		"ETH":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
-		"DASH":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
-		"LTC":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
-		"ETC":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
-		"XRP":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
-		"BCH":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
-		"ZEC":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
-		"QTUM":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
-		"EOS":{"surplus":{"percent":0, "money":0, "formula":""}, "deficit":{"percent":0, "money":0, "formula":""}},
+
+	//行情数据
+	$scope.depth = {
+		"1":{
+			"platform":1,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+
+		"2":{
+			"platform":2,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"3":{
+			"platform":3,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"4":{
+			"platform":4,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"5":{
+			"platform":5,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"6":{
+			"platform":6,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"7":{
+			"platform":7,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"8":{
+			"platform":8,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"9":{
+			"platform":4,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
 	};
 
 	//下拉配置
@@ -111,32 +212,42 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 		"order":[{"Id":1, "Name":"手动"}, {"Id":2, "Name":"自动"}],
 		"type":[{"Id":1, "Name":"顺差"}, {"Id":2, "Name":"逆差"}],
 	};
-	//$scope.precision = 
+
 	//参数配置
 	$scope.settings = SettingsService.data;
 
 	$scope.settingsSave = function(){
-		//console.log($scope.settings.Items);
-		SettingsService.save($scope.settings.Items);
+		$scope.sortList=[];
+		SettingsService.save();
 	};
+
 	//差值排序
 	$scope.sortList = [];
-	$scope.upSort = function(symbol, surplus, deficit ){
+	$scope.upSort = function(data ){
         var key=-1;
 		for (var i=0; i<$scope.sortList.length; i++) {
-            if ($scope.sortList[i].symbol == symbol) {
+            if ($scope.sortList[i].key == data.key) {
             	key = i;
             	break;
             }
         }
-        var data = {"symbol":symbol, "surplus":surplus, "deficit":deficit};
-        if(key>=0){
-            $scope.sortList[key] = data;
+		if (key >-1) {
+			$scope.sortList[key] = data;
 		}else{
-            $scope.sortList.push(data)
+			$scope.sortList.push(data)
 		}
-
 	};
+	//默认排序
+	$scope.sort = "-percent";
+	$scope.chsrot = function(){
+		$scope.sort = $scope.sort == "-percent" ? "percent" : "-percent";
+	};
+	$scope.filters = 1;
+	$scope.searcha = function(obj){
+		return obj.platformA == $scope.filters || obj.platformA == 2;
+	};
+
+	//订单模块
 	$scope.transactionList = [];
 	$scope.addOrder = function( symbol, type ){
 		//默认是顺差数据
@@ -177,98 +288,118 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 	var index = 0;
 	$scope.$on('10000', function(event, data) {
 
-		
 		var obj = angular.fromJson(data);
+		//初始化颜色数据
+		obj.color = {"bids":0, "asks":0};
+		//通过汇率计算人民币
+		obj._bids = $scope.settings.Items.rate[obj.platform] >0 ? obj.bids * $scope.settings.Items.rate[obj.platform] : obj.bids;
+		obj._asks = $scope.settings.Items.rate[obj.platform] >0 ? obj.asks * $scope.settings.Items.rate[obj.platform] : obj.asks;
 
 		//如果数量小于等于0 或者 买盘和卖盘都相等的话，直接返回
-		if ($scope.settings.Items.symbol[obj.symbol].amount<=0 || (obj.bids == $scope.depth[obj.symbol][obj.platform].bids && obj.asks == $scope.depth[obj.symbol][obj.platform].asks) ){
+		if (obj.bids == $scope.depth[obj.platform][obj.symbol].bids && obj.asks == $scope.depth[obj.platform][obj.symbol].asks) {
 			return
 		}
 
-		
-		$scope.depth[obj.symbol][obj.platform] = obj;
-		$scope.depth[obj.symbol][obj.platform]._bids =  $scope.depth[obj.symbol][obj.platform].bids * $scope.settings.Items.rate[obj.platform];
-		$scope.depth[obj.symbol][obj.platform]._asks =  $scope.depth[obj.symbol][obj.platform].asks * $scope.settings.Items.rate[obj.platform];
-		
-		for (i in $scope.depth[obj.symbol] ) {
-
-			for (i in $scope.depth[obj.symbol] ) {
-				//console.log( $scope.depth[obj.symbol][i]);
-			}
+		if(obj._bids.toFixed(2) != $scope.depth[obj.platform][obj.symbol]._bids.toFixed(2) ) {
+			obj.color.bids = 1;
 		}
-		var huobi_bids = $scope.depth[obj.symbol]['1']['_bids'];
-		var huobi_asks = $scope.depth[obj.symbol]['1']['_asks'];
+		if(obj._asks.toFixed(2) != $scope.depth[obj.platform][obj.symbol]._asks.toFixed(2) ) {
+			obj.color.asks = 1;
+		}
 
-		var bithumb_bids = $scope.depth[obj.symbol]['2']['_bids'];
-		var bithumb_asks = $scope.depth[obj.symbol]['2']['_asks'];
 
-		var huobi_bids_total = huobi_bids * $scope.settings.Items.symbol[obj.symbol].amount;
-		var huobi_asks_total = huobi_asks * $scope.settings.Items.symbol[obj.symbol].amount;
-		var bithumb_bids_total = bithumb_bids * $scope.settings.Items.symbol[obj.symbol].amount;
-		var bithumb_asks_total = bithumb_asks * $scope.settings.Items.symbol[obj.symbol].amount;
+		$scope.depth[obj.platform][obj.symbol] = obj;
+		
+		$scope.upDepth2( obj );
 
+
+		var A_bids = $scope.depth[obj.platform][obj.symbol]._bids;
+		var A_asks = $scope.depth[obj.platform][obj.symbol]._asks;
+
+		//总价计算
+		var A_bids_total = A_bids * $scope.settings.Items.symbol[obj.platform][obj.symbol].amount;
+		var A_asks_total = A_asks * $scope.settings.Items.symbol[obj.platform][obj.symbol].amount;
 		//计算交易费
-		var huobi_bids_fee = huobi_bids_total * ($scope.settings.Items.symbol[obj.symbol].fee["1"][0] / 100);
-		var huobi_asks_fee = huobi_asks_total * ($scope.settings.Items.symbol[obj.symbol].fee["1"][0] / 100);
-		var bithumb_bids_fee = bithumb_bids_total *($scope.settings.Items.symbol[obj.symbol].fee["2"][0] / 100);
-		var bithumb_asks_fee = bithumb_asks_total * ($scope.settings.Items.symbol[obj.symbol].fee["2"][0] / 100);
+		var A_bids_fee = A_bids_total * ($scope.settings.Items.symbol[obj.platform][obj.symbol].fee / 100);
+		var A_asks_fee = A_asks_total * ($scope.settings.Items.symbol[obj.platform][obj.symbol].fee / 100);
 
 		//计算转账费
-		var huobi_transfer = huobi_asks * $scope.settings.Items.symbol[obj.symbol].fee["1"][1];
-		var bithumb_transfer = bithumb_asks * $scope.settings.Items.symbol[obj.symbol].fee["2"][1];
+		var A_transfer = A_asks * $scope.settings.Items.symbol[obj.platform][obj.symbol].transfer;
 
-		if(huobi_bids!=0 && huobi_bids !=0 && bithumb_bids!=0 && bithumb_asks!=0){
-				$scope.settings.Items.symbol[obj.symbol].color = true;
-				$timeout(function(){
-					$scope.settings.Items.symbol[obj.symbol].color = false;
-					//return
-				},1000);
 
-				//顺差计算
-				$scope.profit[obj.symbol]["surplus"]['money'] = bithumb_bids_total - huobi_asks_total - bithumb_bids_fee - huobi_asks_fee - huobi_transfer;
-				$scope.profit[obj.symbol]["surplus"]['percent'] = ($scope.profit[obj.symbol]["surplus"]['money'] / huobi_asks_total) * 100;
-				$scope.profit[obj.symbol]["surplus"]['formula'] = bithumb_bids_total +"-"+ huobi_asks_total +"-"+ bithumb_bids_fee +"-"+ huobi_asks_fee +"-"+ huobi_transfer;
-				//逆差计算
-				$scope.profit[obj.symbol]["deficit"]['money'] = huobi_bids_total - bithumb_asks_total - huobi_bids_fee - bithumb_asks_fee - bithumb_transfer ;
-				$scope.profit[obj.symbol]["deficit"]['percent'] = ($scope.profit[obj.symbol]["deficit"]['money'] / bithumb_asks_total) * 100;
-				$scope.profit[obj.symbol]["deficit"]['formula'] = huobi_bids_total +"-"+ bithumb_asks_total +"-"+ huobi_bids_fee +"-"+ bithumb_asks_fee +"-"+ bithumb_transfer ;
-				//放入排序队列
-                $scope.upSort(obj.symbol, $scope.profit[obj.symbol]["surplus"]['percent'], $scope.profit[obj.symbol]["deficit"]['percent']);
-
-				//如果顺差和逆差都不满足条件直接返回
-                if ($scope.profit[obj.symbol]["surplus"]['percent'] < $scope["settings"].surplus &&  $scope.profit[obj.symbol]["deficit"]['percent'] < $scope["settings"].surplus){
-                    return
-                }
-
-                //默认是顺差数据
-                var data = {
-	                "index":index++,
-                    "symbol":obj.symbol,
-                    "mode":$scope.settings.Items.mode,
-                    "buy":huobi_asks,
-                    "sell":bithumb_bids,
-                    "amount": $scope.settings.Items.symbol[obj.symbol].amount,
-                    "percent":$scope.profit[obj.symbol]["surplus"]['percent'],
-                    "money":$scope.profit[obj.symbol]["surplus"]['money'],
-                    "type":1
-                };
-
-                if ($scope.profit[obj.symbol]["deficit"]['percent'] >= $scope["settings"].deficit) {
-                    data['buy'] = bithumb_asks;
-                    data['sell'] = huobi_bids;
-                    data['percent'] = $scope.profit[obj.symbol]["deficit"]['percent'];
-                    data['money'] = $scope.profit[obj.symbol]["deficit"]['money'];
-                    data['type'] = 2;
-                }
-                //添加到消息队列
-                //$scope.message.push(data);
+		//计算盈利
+		for (i in $scope.platform.Items ) {
+			//如果平台相等
+			if($scope.platform.Items[i].Id == obj.platform ||  $scope.depth[$scope.platform.Items[i].Id][obj.symbol]._bids == 0) {
+				continue;
 			}
 
-			$scope.$apply()
+			var B_bids = $scope.depth[$scope.platform.Items[i].Id][obj.symbol]._bids;
+			var B_asks = $scope.depth[$scope.platform.Items[i].Id][obj.symbol]._asks;
+
+			var B_bids_total = B_bids * $scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].amount;
+			var B_asks_total = B_asks * $scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].amount;
+
+			//计算交易费
+			var B_bids_fee = B_bids_total * ($scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].fee / 100);
+			var B_asks_fee = B_asks_total * ($scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].fee / 100);
+
+			//计算转账费
+			var B_transfer = B_asks * $scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].transfer;
+
+
+			//顺差计算
+			var A_money = B_bids_total - A_asks_total - (B_bids_fee + A_asks_fee + A_transfer);
+			var A_percent = (A_money / A_asks_total) * 100;
+			//console.log(A_percent);
+			//$scope.profit[obj.symbol]["surplus"]['formula'] = bithumb_bids_total +"-"+ huobi_asks_total +"-"+ bithumb_bids_fee +"-"+ huobi_asks_fee +"-"+ huobi_transfer;
+			//逆差计算
+			var B_money = A_bids_total - B_asks_total - (A_bids_fee + B_asks_fee + B_transfer) ;
+			var B_percent = (B_money / B_asks_total) * 100;
+			//$scope.profit[obj.symbol]["deficit"]['formula'] = huobi_bids_total +"-"+ bithumb_asks_total +"-"+ huobi_bids_fee +"-"+ bithumb_asks_fee +"-"+ bithumb_transfer ;
+			//console.log(B_percent);
+
+			var push_data = {
+				"key":obj.symbol + "-" + obj.platform + "-" +$scope.platform.Items[i].Id,
+				"symbol":obj.symbol,
+				"platformA": obj.platform,
+				"platformB": $scope.platform.Items[i].Id,
+				"buy":A_asks,
+				"sell":B_bids,
+				"money":A_money,
+				"percent": A_percent,
+				"timestamp": Date.parse( new Date()),
+				"msg":""
+			} ;
+			$scope.upSort(push_data);
+
+			var push_data = {
+				"key":obj.symbol + "-" + $scope.platform.Items[i].Id + "-" + obj.platform ,
+				"symbol":obj.symbol,
+				"platformA": $scope.platform.Items[i].Id,
+				"platformB": obj.platform,
+				"buy":B_asks,
+				"sell":A_bids,
+				"money":B_money,
+				"percent": B_percent,
+				"timestamp": Date.parse( new Date()),
+				"msg":""
+			} ;
+			$scope.upSort(push_data);
+
+			
+		}
+
+		//颜色处理
+		$timeout(function(){
+			$scope.depth[obj.platform][obj.symbol].color.bids = 0;
+			$scope.depth[obj.platform][obj.symbol].color.asks = 0;
+		},1000);
 
 
 
 	});
+	
 
 }]);
 ;
@@ -417,6 +548,387 @@ app.controller("OrderListCtrl", ["$scope", "$http", "$filter", "$modal", "EzConf
 	};
 	
 	$scope.getList();
+}]);
+;
+app.controller("QuantiCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService", "SymbolService", "$timeout", "WebsocketService","BalanceService", "SettingsService","OrderService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService, SymbolService, $timeout, WebsocketService, BalanceService, SettingsService, OrderService) {
+    $scope.height = $scope.windowHeight - 100;
+
+	//平台数据
+	$scope.platform = PlatformService.data;
+	//币种数据
+	$scope.symbol = SymbolService.data;
+
+	//资产状态
+	$scope.balance = BalanceService.data;
+	//更新资产状况
+    $scope.getBalance = function(){
+        BalanceService.getData();
+    };
+
+	//订单列表
+	$scope.order = OrderService.data;
+
+	$scope.tab = 0;
+	$scope.active = function(tab) {
+        $scope.tab = tab;
+	};
+
+	
+
+	$scope.depth2 = {
+		"BTC":[],
+		"ETH":[],
+		"DASH":[],
+		"LTC":[],
+		"ETC":[],
+		"XRP":[],
+		"BCH":[],
+		"ZEC":[],
+		"QTUM":[],
+		"EOS":[]
+	};
+
+	$scope.upDepth2 = function(data ){
+        var key=-1;
+		for (var i=0; i<$scope.depth2[data.symbol].length; i++) {
+            if ($scope.depth2[data.symbol][i].platform == data.platform) {
+            	key = i;
+            	break;
+            }
+        }
+		if (key >-1) {
+			$scope.depth2[data.symbol][key] = data;
+		}else{
+			$scope.depth2[data.symbol].push(data)
+		}
+	};
+
+	//行情数据
+	$scope.depth = {
+		"1":{
+			"platform":1,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+
+		"2":{
+			"platform":2,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"3":{
+			"platform":3,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"4":{
+			"platform":4,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"5":{
+			"platform":5,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"6":{
+			"platform":6,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"7":{
+			"platform":7,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"8":{
+			"platform":8,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+		"9":{
+			"platform":4,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+	};
+
+	//下拉配置
+	$scope.select = {
+		"mode":[{"Id":1, "Name":"买卖"}, {"Id":2, "Name":"卖买"}, {"Id":3, "Name":"同时"}],
+		"order":[{"Id":1, "Name":"手动"}, {"Id":2, "Name":"自动"}],
+		"type":[{"Id":1, "Name":"顺差"}, {"Id":2, "Name":"逆差"}],
+	};
+
+	//参数配置
+	$scope.settings = SettingsService.data;
+
+	$scope.settingsSave = function(){
+		$scope.sortList=[];
+		SettingsService.save();
+	};
+
+	//差值排序
+	$scope.sortList = [];
+	$scope.upSort = function(data ){
+        var key=-1;
+		for (var i=0; i<$scope.sortList.length; i++) {
+            if ($scope.sortList[i].key == data.key) {
+            	key = i;
+            	break;
+            }
+        }
+		if (key >-1) {
+			$scope.sortList[key] = data;
+		}else{
+			$scope.sortList.push(data)
+		}
+	};
+	//默认排序
+	$scope.sort = "-percent";
+	$scope.chsrot = function(){
+		$scope.sort = $scope.sort == "-percent" ? "percent" : "-percent";
+	};
+	$scope.filters = 1;
+	$scope.searcha = function(obj){
+		return obj.platformA == $scope.filters || obj.platformA == 2;
+	};
+
+	//订单模块
+	$scope.transactionList = [];
+	$scope.addOrder = function( symbol, type ){
+		//默认是顺差数据
+		var data = {
+			"index":index++,
+			"symbol":symbol,
+			"mode":$scope.settings.Items.mode,
+			"buy":$scope.depth[symbol]['1']['_bids'],
+			"sell":$scope.depth[symbol]['2']['_asks'],
+			"amount": $scope.settings.Items.symbol[symbol].amount,
+			"percent":$scope.profit[symbol]["surplus"]['percent'],
+			"money":$scope.profit[symbol]["surplus"]['money'],
+			"type":1
+		};
+
+		if (type == 1) {
+			data['buy'] = $scope.depth[symbol]['2']['_bids'];
+			data['sell'] = $scope.depth[symbol]['1']['_asks'];
+			data['percent'] = $scope.profit[symbol]["deficit"]['percent'];
+			data['money'] = $scope.profit[symbol]["deficit"]['money'];
+			data['type'] = 2;
+		}
+
+		$scope.transactionList.push(data);
+
+	};
+
+	$scope.addTransaction = function( index ){
+
+		var data = $scope.message[index];
+		data.state = 1;
+		$scope.transactionList.push(data);
+		
+	};
+	
+	
+	$scope.message = [];
+	var index = 0;
+	$scope.$on('10000', function(event, data) {
+
+		var obj = angular.fromJson(data);
+		//初始化颜色数据
+		obj.color = {"bids":0, "asks":0};
+		//通过汇率计算人民币
+		obj._bids = $scope.settings.Items.rate[obj.platform] >0 ? obj.bids * $scope.settings.Items.rate[obj.platform] : obj.bids;
+		obj._asks = $scope.settings.Items.rate[obj.platform] >0 ? obj.asks * $scope.settings.Items.rate[obj.platform] : obj.asks;
+
+		//如果数量小于等于0 或者 买盘和卖盘都相等的话，直接返回
+		if (obj.bids == $scope.depth[obj.platform][obj.symbol].bids && obj.asks == $scope.depth[obj.platform][obj.symbol].asks) {
+			return
+		}
+
+		if(obj._bids.toFixed(2) != $scope.depth[obj.platform][obj.symbol]._bids.toFixed(2) ) {
+			obj.color.bids = 1;
+		}
+		if(obj._asks.toFixed(2) != $scope.depth[obj.platform][obj.symbol]._asks.toFixed(2) ) {
+			obj.color.asks = 1;
+		}
+
+
+		$scope.depth[obj.platform][obj.symbol] = obj;
+		
+		$scope.upDepth2( obj );
+
+
+		var A_bids = $scope.depth[obj.platform][obj.symbol]._bids;
+		var A_asks = $scope.depth[obj.platform][obj.symbol]._asks;
+
+		//总价计算
+		var A_bids_total = A_bids * $scope.settings.Items.symbol[obj.platform][obj.symbol].amount;
+		var A_asks_total = A_asks * $scope.settings.Items.symbol[obj.platform][obj.symbol].amount;
+		//计算交易费
+		var A_bids_fee = A_bids_total * ($scope.settings.Items.symbol[obj.platform][obj.symbol].fee / 100);
+		var A_asks_fee = A_asks_total * ($scope.settings.Items.symbol[obj.platform][obj.symbol].fee / 100);
+
+		//计算转账费
+		var A_transfer = A_asks * $scope.settings.Items.symbol[obj.platform][obj.symbol].transfer;
+
+
+		//计算盈利
+		for (i in $scope.platform.Items ) {
+			//如果平台相等
+			if($scope.platform.Items[i].Id == obj.platform ||  $scope.depth[$scope.platform.Items[i].Id][obj.symbol]._bids == 0) {
+				continue;
+			}
+
+			var B_bids = $scope.depth[$scope.platform.Items[i].Id][obj.symbol]._bids;
+			var B_asks = $scope.depth[$scope.platform.Items[i].Id][obj.symbol]._asks;
+
+			var B_bids_total = B_bids * $scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].amount;
+			var B_asks_total = B_asks * $scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].amount;
+
+			//计算交易费
+			var B_bids_fee = B_bids_total * ($scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].fee / 100);
+			var B_asks_fee = B_asks_total * ($scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].fee / 100);
+
+			//计算转账费
+			var B_transfer = B_asks * $scope.settings.Items.symbol[$scope.platform.Items[i].Id][obj.symbol].transfer;
+
+
+			//顺差计算
+			var A_money = B_bids_total - A_asks_total - (B_bids_fee + A_asks_fee + A_transfer);
+			var A_percent = (A_money / A_asks_total) * 100;
+			//console.log(A_percent);
+			//$scope.profit[obj.symbol]["surplus"]['formula'] = bithumb_bids_total +"-"+ huobi_asks_total +"-"+ bithumb_bids_fee +"-"+ huobi_asks_fee +"-"+ huobi_transfer;
+			//逆差计算
+			var B_money = A_bids_total - B_asks_total - (A_bids_fee + B_asks_fee + B_transfer) ;
+			var B_percent = (B_money / B_asks_total) * 100;
+			//$scope.profit[obj.symbol]["deficit"]['formula'] = huobi_bids_total +"-"+ bithumb_asks_total +"-"+ huobi_bids_fee +"-"+ bithumb_asks_fee +"-"+ bithumb_transfer ;
+			//console.log(B_percent);
+
+			var push_data = {
+				"key":obj.symbol + "-" + obj.platform + "-" +$scope.platform.Items[i].Id,
+				"symbol":obj.symbol,
+				"platformA": obj.platform,
+				"platformB": $scope.platform.Items[i].Id,
+				"buy":A_asks,
+				"sell":B_bids,
+				"money":A_money,
+				"percent": A_percent,
+				"timestamp": Date.parse( new Date()),
+				"msg":""
+			} ;
+			$scope.upSort(push_data);
+
+			var push_data = {
+				"key":obj.symbol + "-" + $scope.platform.Items[i].Id + "-" + obj.platform ,
+				"symbol":obj.symbol,
+				"platformA": $scope.platform.Items[i].Id,
+				"platformB": obj.platform,
+				"buy":B_asks,
+				"sell":A_bids,
+				"money":B_money,
+				"percent": B_percent,
+				"timestamp": Date.parse( new Date()),
+				"msg":""
+			} ;
+			$scope.upSort(push_data);
+
+			
+		}
+
+		//颜色处理
+		$timeout(function(){
+			$scope.depth[obj.platform][obj.symbol].color.bids = 0;
+			$scope.depth[obj.platform][obj.symbol].color.asks = 0;
+		},1000);
+
+
+
+	});
+	
+
 }]);
 ;
 app.controller("SecretEditCtrl", ["$scope", "$http", "$filter", "$modalInstance", "curr_data", "appCfg", "PlatformService", function ($scope, $http, $filter, $modalInstance, curr_data, appCfg, PlatformService) {
@@ -785,6 +1297,39 @@ app.filter('FileSize', [function() {
 }]);
 
 ;
+app.filter('search', [function() {
+    return function(array, where) {
+
+        var output = [];
+        var timestamp = Date.parse( new Date()) ;
+        var expired = 60000;
+        if(angular.isDefined(where)){
+            expired = where.expired * 1000;
+        }
+
+        angular.forEach(array, function (item) {
+            //时间错过滤
+            if ((timestamp - item.timestamp) < expired ){
+                //币种是否满足条件
+                if (angular.isDefined(where.symbol[item.symbol]) && where.symbol[item.symbol]) {
+                    //主站是否满足条件
+                    if (angular.isDefined(where.platformA[item.platformA]) && where.platformA[item.platformA]) {
+						//次站是否满足条件
+                        if (angular.isDefined(where.platformB[item.platformB]) && where.platformB[item.platformB]) {
+                            item.msg =  ((timestamp - item.timestamp) / 1000).toFixed(0) + " 秒前";
+                            output.push(item);
+                        }
+                    }
+                }
+            }
+
+
+        });
+        return output;
+    };
+}]);
+
+;
 app.service('BalanceService', ["$rootScope", "$http", "$filter", "appCfg", function($rootScope, $http, $filter, appCfg) {
 	var self = this;
 	
@@ -874,7 +1419,67 @@ app.service('SettingsService', ["$rootScope", "$http", "$filter", "appCfg", "EzC
 
         $http.get(url).success(function(data, status, headers, config) {
                 if($filter("CheckError")(data)){
-                    self.data.Items = angular.fromJson(data.Data);
+                    var temp = angular.fromJson(data.Data);
+                    for(var i=1; i<=9;i++){
+                        if (angular.isUndefined(temp.rate[i])){
+                            temp.rate[i] = 1;
+                        }
+                        if (angular.isUndefined(temp.symbol[i])){
+                            temp.symbol[i] = {
+                                "BTC": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "ETH": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "DASH": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "LTC": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "ETC": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "XRP": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "BCH": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "ZEC": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "QTUM": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "EOS": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                }
+                            };
+                        }
+                    }
+                    self.data.Items = temp;
                 }
             }) .error(function(data, status, headers, config) {
 
@@ -897,7 +1502,32 @@ app.service('SettingsService', ["$rootScope", "$http", "$filter", "appCfg", "EzC
 
 
 ;
-app.service('WebsocketService', ['$rootScope', function($rootScope) {
+app.service('SymbolService', ["$rootScope", "$http", "$filter", "appCfg", function($rootScope, $http, $filter, appCfg) {
+    var self = this;
+
+    this.data = {
+        "Items":[]
+    };
+
+    this.getData = function() {
+        var url = appCfg.AppPrefix + "/apppub/symbol";
+
+        $http.get(url).success(function(data, status, headers, config) {
+                if($filter("CheckError")(data)){
+                    self.data.Items = data.Data;
+                }
+            })
+            .error(function(data, status, headers, config) {
+
+            });
+    };
+
+    this.getData();
+}]);
+
+
+;
+app.service("WebsocketService", ["$rootScope", "$filter", function($rootScope, $filter) {
 
 	var Service = {};
     var ws = null;
@@ -921,7 +1551,7 @@ app.service('WebsocketService', ['$rootScope', function($rootScope) {
 	    };
 	    
 	    ws.onclose = function () {
-			console.log("连接关闭");
+			$filter("AlertError")("与服务器断开连接，尝试刷新页面重新连接");
 			conn = false;
 		};
 		

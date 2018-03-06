@@ -1,4 +1,4 @@
-html {
+﻿html {
     font-family: "微软雅黑","宋体","sans-serif","黑体",;
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%
@@ -139,7 +139,7 @@ optgroup {
 
 table {
     border-collapse: collapse;
-    border-spacing: 0
+    border-spacing: 0;
 }
 
 td, th {
@@ -7260,6 +7260,35 @@ img {
     margin-bottom: -15px
 }
 
+
+.pr-0 {
+	padding-right:0 !important;
+}
+.pr-15 {
+	padding-right:15px !important;
+}
+.pr-20 {
+	padding-right:20px !important;
+}
+.pr-25 {
+	padding-right:25px !important;
+}
+.pl-0 {
+	padding-left:0 !important;
+}
+.pl-5 {
+	padding-left:5px !important;
+}
+.pl-10 {
+	padding-left:10px !important;
+}
+.pl-15 {
+	padding-left:15px !important;
+}
+
+.pad-0 {
+	padding:0 !important;
+}
 .pad-1 {
     padding: 1px !important
 }
@@ -7371,7 +7400,9 @@ img {
 .pv-60 {
     padding: 60px 0 !important
 }
-
+.pt-0 {
+    padding-top: 0px !important
+}
 .pt-5 {
     padding-top: 5px !important
 }
@@ -7399,11 +7430,24 @@ img {
 .pb-15 {
     padding-bottom: 15px !important
 }
-
+.mt-0 {
+	margin-top:0 !important
+}
 .mt-5 {
     margin-top: 5px !important
 }
-
+.mt-10 {
+    margin-top: 10px !important
+}
+.mt-15 {
+    margin-top: 15px !important
+}
+.mt-20 {
+    margin-top: 20px !important
+}
+.mar-15 {
+	margin:15px !important
+}
 .mt-10 {
     margin-top: 10px !important
 }
@@ -7411,7 +7455,9 @@ img {
 .mt-15 {
     margin-top: 15px !important
 }
-
+.mb-0 {
+    margin-bottom: 0 !important
+}
 .mb-5 {
     margin-bottom: 5px !important
 }
@@ -7436,6 +7482,10 @@ img {
     margin-bottom: 30px !important
 }
 
+.mr-0 {
+    margin-right: 0px !important
+}
+
 .mr-5 {
     margin-right: 5px !important
 }
@@ -7450,6 +7500,28 @@ img {
 
 .mr-20 {
     margin-right: 20px !important
+}
+
+.ml-0 {
+    margin-left: 0px !important
+}
+.ml-1 {
+    margin-left: 1px !important
+}
+.ml-5 {
+    margin-left: 5px !important
+}
+
+.ml-10 {
+    margin-left: 10px !important
+}
+
+.ml-15 {
+    margin-left: 15px !important
+}
+
+.ml-20 {
+    margin-left: 20px !important
 }
 
 .height-45 {
@@ -10723,7 +10795,6 @@ img.img130_130 {
 
 .panel-default > .panel-heading {
     color: #666;
-    background-color: #f6f6f6
 }
 
 .panel-default > .panel-heading + .panel-collapse > .panel-body {
@@ -13362,7 +13433,8 @@ a.fc-more:hover {
 
 .nav-tabs > li {
     float: left;
-    margin-bottom: -1px
+    margin-bottom: -1px;
+	cursor:pointer;
 }
 
 .nav-tabs > li > a {
@@ -16585,7 +16657,7 @@ div.config h4 a:hover {
     .header-container > .top-header .logo {
         display: inline-block;
         width: 220px;
-        border-right: 1px solid rgba(255, 255, 255, .1)
+        border-right: 0px solid rgba(255, 255, 255, .1)
     }
 }
 
@@ -21224,4 +21296,38 @@ body {
 	padding: 0 5px;
 } 
 
-.market-buy{background-color:#D3E7EF;-ms-transition-duration:0s;transition-duration:0s;}
+
+.up {
+	animation-name:background-up-flash;
+	animation-duration:0.6s;
+	background-color:#ff720d\0;
+	opacity:0.7;
+	color:#000000;
+}
+
+
+.down {
+	animation-name:background-down-flash;
+	animation-duration:0.6s;
+	background-color:#6a90ad\0;
+	opacity:0.7;
+	color:#000000;
+}
+
+
+@keyframes background-up-flash {
+	from,50%,to {
+		background-color:rgba(236,84,87,0)
+	}
+	25%,75% {
+		background-color:rgba(236,84,87,0.15)
+	}
+}
+@keyframes background-down-flash {
+	from,50%,to {
+		background-color:rgba(58,135,173,0)
+	}
+	25%,75% {
+		background-color:rgba(58,135,173,0.15)
+	}
+}

@@ -1,0 +1,295 @@
+
+
+<div class="page text-warning pt-0">
+    <!--走势图START-->
+    <div class="row mt-0">
+		<div class="panel panel-default text-center">
+           <div id="container" style="min-width:400px;height:300px; background-color:#FCFFC5">图表加载中...</div>
+        </div>
+    </div>    
+    <script>
+	$(function () {
+    Highcharts.setOptions({
+        lang: {
+            rangeSelectorZoom: ''
+        }
+    });
+    //$.getJSON('https://data.jianshukeji.com/stock/history/000001', function (data) {
+		$.getJSON('http://www.huobi.sh.cn:8080/index/index/getkline', function (data) {
+        if(data.code !== 1) {
+            alert('读取股票数据失败！');
+            return false;
+        }
+        data = data.data;
+        var ohlc = [],
+            volume = [],
+            dataLength = data.length,
+            // set the allowed units for data grouping
+            groupingUnits = [[
+                'week',                         // unit name
+                [1]                             // allowed multiples
+            ], [
+                'month',
+                [1, 2, 3, 4, 6]
+            ]],
+            i = 0;
+        //for (i; i < dataLength; i += 1) {
+        //    ohlc.push([
+        //        data[i]["tick_id"], // the date
+        //        data[i]["open"], // open
+        //        data[i]["low"], // high
+        //        data[i]["high"], // low
+        //        data[i]["close"] // close
+        //    ]);
+        //    volume.push([
+        //        data[i]["tick_id"], // the date
+        //        data[i]["vol"] // the volume
+        //    ]);
+		//		}
+
+		for (var item in data) {
+			 console.log(item);//得到键
+			 console.log(jsondata[0][item]);//得到键对应的值
+		
+        }
+        // create the chart
+        $('#container').highcharts('StockChart', {
+            rangeSelector: {
+                inputEnabled : false,
+				selected: 4,
+                inputDateFormat: '%Y-%m-%d',
+				buttons: [{
+					type: 'minute',
+					count: 1,
+					text: '1min'
+				}, {
+					type: 'minute',
+					count: 5,
+					text: '5min'
+				}, {
+					type: 'minute',
+					count: 15,
+					text: '15min'
+				}, {
+					type: 'all',
+					text: 'All'
+				}]
+            },			
+            title: {
+				//标提
+                text: ''
+            },
+			chart: {
+				//背景颜色
+				backgroundColor: '#FCFFC5'
+			},
+			credits: {
+				//版权设置
+				enabled:false
+			},
+            xAxis: {
+                dateTimeLabelFormats: {
+                    millisecond: '%H:%M:%S.%L',
+                    second: '%H:%M:%S',
+                    minute: '%H:%M',
+                    hour: '%H:%M',
+                    day: '%m-%d',
+                    week: '%m-%d',
+                    month: '%y-%m',
+                    year: '%Y'
+                }
+            },
+            tooltip: {
+                split: false,
+                shared: true
+            },
+            yAxis: [{
+                labels: {
+                    align: 'right',
+                    x: -3
+                },
+                title: {
+                    text: '价格'
+                },
+                height: '65%',
+                resize: {
+                    enabled: true
+                },
+                lineWidth: 2
+            }, {
+                labels: {
+                    align: 'right',
+                    x: -3
+                },
+                title: {
+                    text: '成交量'
+                },
+                top: '65%',
+                height: '35%',
+                offset: 0,
+                lineWidth: 2
+            }],
+			//滚动条
+			scrollbar:{
+				enabled: false
+			},
+			//导航器
+			navigator:{
+				enabled: false
+			},
+				
+            series: [{
+                type: 'candlestick',
+                color: 'green',
+                lineColor: 'green',
+                upColor: 'red',
+                upLineColor: 'red',				
+                tooltip: {
+                },
+                navigatorOptions: {
+                    color: Highcharts.getOptions().colors[0]
+                },
+                data: ohlc,
+                dataGrouping: {
+                    units: groupingUnits
+                },
+                id: 'sz'
+            },{
+                type: 'column',
+                data: volume,
+                yAxis: 1
+            }]
+        });
+    });
+});
+</script>
+    <!--走势图END-->
+    
+    <!--主内容START-->
+    <div class="row">
+    	<div class="col-md-8 pr-0">
+        	<div class="panel panel-default " style="height:500px">
+				<div class="row ml-10 pt-10 mr-10">
+                    <div class="col-md-6 asks-explain pad-10">
+                    	<div class="loading text-center">
+                            <img src="/static/img/loading.gif" class="mt-0"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6 bids-explain pad-10">
+                        <div class="finish">
+                            <span class="title"><i class="fa fa-bell"></i> 完成卖出</span> 
+                            <br /><br />
+                            <i class="fa fa-navicon"></i> 卖出条件: 20170105阴线
+                            <br />
+                            　卖出价格: 510 * 20 = 10200元
+                            <br /><br />
+                            <i class="fa fa-bullhorn"></i> 本次利润: 200元 
+                        </div>
+                    </div>                                              
+               </div>               
+        	</div>
+        </div>
+        
+        <div class="col-md-4">
+        	<div class="panel panel-default pad-10" style="height:250px">
+               <div class="row">
+                    <div class="col-md-2">
+                        <label class="control-label pt-5">方案:</label>                        
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-control btn-30">
+                        	<option value="8">Zb</option>
+                        </select>                  
+                    </div>
+                    <div class="col-md-4">
+                        <div class="btn-group pull-right">
+                            <a href="#" class="btn btn-default btn-sm">模拟方案</a>
+                        </div>      
+                    </div>                    
+               </div>
+               
+               <div class="row pad-15">
+                    <div class="panel-explain pad-10" style="height:140px">
+                        <div class="row pad-10 pt-0">
+                        	<div class="col-md-1 pad-0 text-center">
+                                 <i class="fa fa-navicon" style="margin-top:5px;"></i>            
+                            </div>
+                            <div class="col-md-11 pad-0">
+                                买入：连续<input  class="text-explain" type="number" >个<input  class="text-explain" type="number" >分钟线为阳线，并且<input  class="text-explain" type="number" >为也是阳线时买入
+                            </div>
+                        </div>
+                        
+                        <div class="row pad-10 pt-0">
+                        	<div class="col-md-1 pad-0 text-center">
+                                 <i class="fa fa-navicon" style="margin-top:5px;"></i>            
+                            </div>
+                            <div class="col-md-11 pad-0">
+                                卖出：当前价格　>= 买入价格的　<input  class="text-explain" type="number" >倍或当前价格　<= 第<input  class="text-explain" type="number" >个　<input  class="text-explain" type="number" >分钟线开盘价。
+                            </div>
+                        </div>
+                        
+                    </div>                                              
+               </div>
+               
+               <div class="row">
+               		<div class="col-md-8 pt-5">
+                        * 自动交易有风险, 请慎重使用！                  
+                    </div>
+                    <div class="btn-group pull-right pr-15">
+                        <a href="#" class="btn btn-default btn-sm">开始挣钱</a>
+                    </div> 	
+                                                          
+               </div>
+               
+        	</div>
+            
+            <div class="panel panel-default pad-10" style="height:230px">
+                <div class="row pl-15">
+                	我的资产
+                </div>
+                <div class="row pl-15 pr-15 mt-10" data-slim-scroll data-scroll-height="200px">
+                	<table class="table" style="border-top: 1px solid #eee">
+                    	<tr style="background-color: #f9f9f9">
+                        	<th>币种</th>
+                            <th>金额</th>
+						</tr>
+                        <tr>
+                        	<td>KRW</td>
+                            <td>0.00</td>
+						</tr>
+                        <tr>
+                        	<td>KRW</td>
+                            <td>0.00</td>
+						</tr>
+                        <tr>
+                        	<td>KRW</td>
+                            <td>0.00</td>
+						</tr>
+                        <tr>
+                        	<td>KRW</td>
+                            <td>0.00</td>
+						</tr>
+                        <tr>
+                        	<td>KRW</td>
+                            <td>0.00</td>
+						</tr>
+                        <tr>
+                        	<td>KRW</td>
+                            <td>0.00</td>
+						</tr>
+                        <tr>
+                        	<td>KRW</td>
+                            <td>0.00</td>
+						</tr>
+					</table>
+                </div>
+                
+                
+               
+        	</div>
+        </div>
+		
+    </div>
+    <!--走势图END-->
+</div>
+<!-- Flot Chart Body End -->

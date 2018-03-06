@@ -3,15 +3,17 @@ package controllers
 import (
 	"Deal/models"
 	"encoding/json"
-	"github.com/antonholmquist/jason"
-	"github.com/astaxie/beego"
-	"github.com/beego/i18n"
 	_ "strconv"
 	"strings"
 	"tsEngine/tsCrypto"
 	"tsEngine/tsDb"
 	"tsEngine/tsString"
 	"tsEngine/tsTime"
+
+	_ "github.com/antonholmquist/jason"
+	"github.com/astaxie/beego"
+	"github.com/beego/i18n"
+	"github.com/tidwall/gjson"
 )
 
 type BaseController struct {
@@ -122,28 +124,26 @@ func (this *BaseController) CheckPermission() {
 		this.TraceJson()
 	}
 	pass := 0
+	mode := params[len(params)-2]
+	function := params[len(params)-1]
+
 	for _, v := range list {
 
 		permission := v["Permission"].(string)
 		if permission == "" {
 			permission = "{}"
 		}
-		temp, _ := jason.NewObjectFromBytes([]byte(permission))
 
-		temp, err := temp.GetObject(params[2])
-		if err != nil {
+		status := gjson.Get(permission, mode+"."+function).Bool()
+		if !status {
 			continue
 		}
-		value, err := temp.GetBoolean(params[3])
-		//beego.Trace(value)
-		if err != nil || !value {
-			continue
-		}
+
 		pass = 1
 		break
 	}
 
-	md5 := tsCrypto.GetMd5([]byte(params[2] + params[3]))
+	md5 := tsCrypto.GetMd5([]byte(mode + function))
 
 	var oMode models.Mode
 	oMode.Md5 = md5
@@ -200,6 +200,7 @@ func (this *BaseController) CheckRoot() {
 func (this *BaseController) CheckIp() {
 
 	ip := this.Ctx.Request.Header.Get("X-Forwarded-For")
+
 	//ip过滤
 	var oIpban models.Ipban
 

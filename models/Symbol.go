@@ -6,13 +6,18 @@ import (
 
 //币种表模型
 type Symbol struct {
-	Id      int64
-	Symbol  string
-	Huobi   string
-	Bithumb string
-	Surplus int64
-	Amount  float64
-	State   int64
+	Id       int64
+	Symbol   string
+	Sort     int64
+	Huobi    string
+	Bithumb  string
+	Binance  string
+	Coinone  string
+	Korbit   string
+	Coinnest string
+	Gate     string
+	Okex     string
+	Zb       string
 }
 
 func init() {

@@ -1,0 +1,200 @@
+package depth
+
+import (
+	"Deal/models"
+	"Deal/service"
+	"fmt"
+	"time"
+	"tsEngine/tsDb"
+
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
+)
+
+type Sub struct {
+Platform int
+Symbol string 
+currency string
+	
+}
+var (
+	symbolManage = make(map[string]string)
+symbolData []orm.Params
+depthChan make(chan Subscriber, 100)
+)
+
+//开启实时行情
+func DepthRun() {
+
+	for _, v := range symbolData {
+		if v["Coinone"].(string) != "" {
+			go getDepth(4, v["Symbol"].(string), v["Coinone"].(string))
+		}
+		/*
+				if v["Bithumb"].(string) != "" {
+					go getDepth(2, v["Symbol"].(string), v["Bithumb"].(string))
+				}
+
+					if v["Binance"].(string) != "" {
+						go GetDepth(3, v["Symbol"].(string), v["Binance"].(string))
+					}
+
+
+
+			if v["Korbit"].(string) != "" {
+				go getDepth(5, v["Symbol"].(string), v["Korbit"].(string))
+			}
+		*/
+		if v["Coinnest"].(string) != "" {
+			go getDepth(6, v["Symbol"].(string), v["Coinnest"].(string))
+		}
+
+		if v["Gate"].(string) != "" {
+			go getDepth(7, v["Symbol"].(string), v["Gate"].(string))
+		}
+
+		if v["Okex"].(string) != "" {
+			go getDepth(8, v["Symbol"].(string), v["Okex"].(string))
+		}
+
+	}
+
+}
+
+func getDepth(platform int64, symbol string, _symbol string) {
+
+	switch platform {
+
+	case 2:
+		obj := models.Bithumb{}
+		for {
+
+			bids, asks, timestamp := obj.Depth(_symbol, 0)
+
+			if bids != 0 && asks != 0 {
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":%d, "bids":%f, "asks":%f, "time":%d}`, symbol, platform, bids, asks, timestamp)
+				service.Publish(0, data)
+			}
+			time.Sleep(500 * time.Millisecond)
+
+		}
+
+	case 3:
+		obj := models.Binance{}
+
+		for {
+
+			bids, asks, timestamp := obj.Depth(_symbol, 0)
+
+			if bids != 0 && asks != 0 {
+
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":%d, "bids":%f, "asks":%f, "time":%d}`, symbol, platform, bids, asks, timestamp)
+				service.Publish(0, data)
+			}
+
+			time.Sleep(1000 * time.Millisecond)
+		}
+
+	case 4:
+		obj := models.Coinone{}
+
+		for {
+
+			bids, asks, timestamp := obj.Depth(_symbol, 0)
+
+			if bids != 0 && asks != 0 {
+
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":%d, "bids":%f, "asks":%f, "time":%d}`, symbol, platform, bids, asks, timestamp)
+				service.Publish(0, data)
+			}
+
+			time.Sleep(1000 * time.Millisecond)
+		}
+	case 5:
+		obj := models.Korbit{}
+
+		for {
+
+			bids, asks, timestamp := obj.Depth(_symbol, 0)
+
+			if bids != 0 && asks != 0 {
+
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":%d, "bids":%f, "asks":%f, "time":%d}`, symbol, platform, bids, asks, timestamp)
+				service.Publish(0, data)
+			}
+
+			time.Sleep(1000 * time.Millisecond)
+		}
+	case 6:
+		obj := models.Coinnest{}
+
+		for {
+
+			bids, asks, timestamp := obj.Depth(_symbol, 0)
+
+			if bids != 0 && asks != 0 {
+
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":%d, "bids":%f, "asks":%f, "time":%d}`, symbol, platform, bids, asks, timestamp)
+				service.Publish(0, data)
+			}
+
+			time.Sleep(1000 * time.Millisecond)
+		}
+	case 7:
+		obj := models.Gate{}
+
+		for {
+
+			bids, asks, timestamp := obj.Depth(_symbol, 0)
+
+			if bids != 0 && asks != 0 {
+
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":%d, "bids":%f, "asks":%f, "time":%d}`, symbol, platform, bids, asks, timestamp)
+				service.Publish(0, data)
+			}
+
+			time.Sleep(1000 * time.Millisecond)
+		}
+	case 8:
+		obj := models.Okex{}
+
+		for {
+
+			bids, asks, timestamp := obj.Depth(_symbol, 0)
+
+			if bids != 0 && asks != 0 {
+
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":%d, "bids":%f, "asks":%f, "time":%d}`, symbol, platform, bids, asks, timestamp)
+				service.Publish(0, data)
+			}
+
+			time.Sleep(1000 * time.Millisecond)
+		}
+	case 9:
+		obj := models.Zb{}
+
+		for {
+
+			bids, asks, timestamp := obj.Depth(_symbol, 0)
+
+			if bids != 0 && asks != 0 {
+
+				data := fmt.Sprintf(`{"symbol":"%s", "platform":%d, "bids":%f, "asks":%f, "time":%d}`, symbol, platform, bids, asks, timestamp)
+				service.Publish(0, data)
+			}
+
+			time.Sleep(1000 * time.Millisecond)
+		}
+
+	}
+
+}
+
+//获取币种信息
+func GetSymbol() {
+	db := tsDb.NewDbBase()
+	oSymbol := models.Symbol{}
+	symbolData, _ = db.DbList(&oSymbol)
+	beego.Trace("币种获取完毕")
+
+}

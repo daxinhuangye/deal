@@ -34,8 +34,11 @@ var (
 	// Long polling waiting list.
 	waitingList = list.New()
 	subscribers = list.New()
-	depth       = true
 )
+
+func init() {
+	go chatroom()
+}
 
 // This function handles all incoming chan messages.
 func chatroom() {
@@ -43,14 +46,15 @@ func chatroom() {
 	for {
 		select {
 		case sub := <-subscribe:
+			//如果用户不在线
 			if !isUserExist(subscribers, sub.Name) {
-				subscribers.PushBack(sub) // Add user to the end of list.
-				// Publish a JOIN event.
+				//添加一个用户到列表中
+				subscribers.PushBack(sub)
+				//发送一个用户加入的事件到客户端告诉其他人
 				publish <- newEvent(models.EVENT_JOIN, sub.Name, "")
 				beego.Info("New user:", sub.Name, ";WebSocket:", sub.Conn != nil)
-			} else {
-				beego.Info("Old user:", sub.Name, ";WebSocket:", sub.Conn != nil)
 			}
+
 		case event := <-publish:
 			// Notify waiting list.
 			for ch := waitingList.Back(); ch != nil; ch = ch.Prev() {
@@ -80,10 +84,6 @@ func chatroom() {
 			}
 		}
 	}
-}
-
-func init() {
-	go chatroom()
 }
 
 func isUserExist(subscribers *list.List, user int64) bool {
@@ -134,6 +134,7 @@ func broadcastWebSocket(event models.Event) {
 }
 
 func Join(user int64, ws *websocket.Conn) {
+
 	subscribe <- Subscriber{Name: user, Conn: ws}
 }
 
@@ -143,8 +144,4 @@ func Leave(user int64) {
 
 func Publish(userId int64, data string) {
 	publish <- newEvent(models.EVENT_MESSAGE, userId, data)
-}
-
-func GetDepthState() bool {
-	return depth
 }

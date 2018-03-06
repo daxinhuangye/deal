@@ -5,7 +5,10 @@ app.config( ["$routeProvider", function ($routeProvider) {
 		templateUrl: '/static/page/app/depth.html',
 		controller: "DepthCtrl"
 	});
-
+	$routeProvider.when('/quanti', {
+		templateUrl: '/static/page/app/quanti.html',
+		controller: "QuantiCtrl"
+	});
 	$routeProvider.when('/secret/list', {
 		templateUrl: '/static/page/app/secret_list.html',
 		controller: "SecretListCtrl"

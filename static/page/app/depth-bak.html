@@ -1,55 +1,37 @@
 <div class="page text-warning ">
     <div class="row">
-        <div class="col-md-8 pt-0 ph-5">
+        <div class="col-md-8 pad-5">
             <div data-slim-scroll data-scroll-height="{{height}}">
-                <div ng-repeat="items in symbol.Items | orderBy:['Sort']">
-                    <div class="col-md-4 pt-0 pad-5">
-                        <div class="panel panel-default mb-5" style="height:400px">
+                <div ng-repeat="items in symbol.Items">
+                    <div class="col-md-4 pad-5">
+                        <div class="panel panel-default ">
                             <div class="panel-heading">
                                 <h3 class="panel-title">{{items.Symbol}}行情
                                     <div class="pull-right"> 预留区域</div>
                                 </h3>
                             </div>
-                            <div class="panel-body pad-10">
-                                <div class="col-md-6 pr-0 pl-0">
-                                    <table class="table mb-0">
-                                        <tr style="background-color: #f9f9f9">
-                                            <th>平台</th>
-                                            <th class="text-right">卖盘(+)</th>
-                                        </tr>
-                                        <tr ng-repeat="item in depth2[items.Symbol] | orderBy :['_asks']">
-                                            <td>{{item.platform|arrayAttr:platform.Items:'Name'}}</td>
+                            <div class="panel-body pad-10 ">
+                                <table class="table">
+                                    <tr style="background-color: #f9f9f9">
+                                        <th>平台</th>
+                                        <th class="text-right">买盘</th>
+                                        <th class="text-right">卖盘</th>
+                                    </tr>
+                                    <tr ng-repeat="item in platform.Items">
+                                        <td>{{item.Name}}</td>
+                                        <td class="text-right"
+                                            ng-class="{'down': depth[item.Id][items.Symbol].color.bids}"
+                                            title="平台价格:{{depth[item.Id][items.Symbol].bids | number:4}}">
+                                            {{depth[item.Id][items.Symbol]._bids | number:2}}
+                                        </td>
+                                        <td class="text-right"
+                                            ng-class="{'up': depth[item.Id][items.Symbol].color.asks}"
+                                            title="平台价格:{{depth[item.Id][items.Symbol].asks | number:4}}">
+                                            {{depth[item.Id][items.Symbol]._asks | number:2}}
+                                        </td>
+                                    </tr>
 
-                                            <td class="text-right"
-                                                ng-class="{'down': depth[item.platform][item.symbol].color.asks}"
-                                                title="平台价格:{{item.asks | number:4}}">
-                                                {{item._asks | number:2}}
-                                            </td>
-                                        </tr>
-
-                                    </table>
-                                </div>
-                                <div class="col-md-6 pr-0 pl-0">
-                                    <table class="table mb-0">
-                                        <tr style="background-color: #f9f9f9">
-
-                                            <th>(-)买盘</th>
-                                            <th class="text-right">平台</th>
-                                        </tr>
-                                        <tr ng-repeat="item in depth2[items.Symbol] | orderBy :['-_bids']">
-
-                                            <td ng-class="{'up': depth[item.platform][item.symbol].color.bids}"
-                                                title="平台价格:{{item.bids | number:4}}">
-                                                {{item._bids | number:2}}
-                                            </td>
-                                            <td class="text-right">{{item.platform|arrayAttr:platform.Items:'Name'}}
-                                            </td>
-                                        </tr>
-
-                                    </table>
-                                </div>
-
-
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -58,8 +40,8 @@
 
         </div>
 
-        <div class="col-md-4 mt-0 pl-0 ">
-            
+        <div class="col-md-4 np mt-10">
+            <div data-slim-scroll data-scroll-height="{{height}}">
 
                 <div class="panel panel-default  mb-5">
                     <div class="panel-body  pad-5">
@@ -68,41 +50,22 @@
                                 <div class="col-md-12 pad-5">
                                     <div class="panel-body pad-5">
                                         <table class="table table-striped mb-5">
-                                            <th width="12%" class="text-center">币种</th>
-                                            <th class="text-center"> 方向</th>
-                                            <th width="14%" class="text-right" ng-click="chsrot();">利率</th>
-                                            <th width="14%" class="text-right">利润</th>
-                                            <th width="14%" class="text-center">时间</th>
-                                            <th width="14%" class="text-center">操作</th>
+                                            <th width="15%">币种</th>
+                                            <th  class="text-center"> 方向</th>
+                                            <th width="15%" class="text-right" ng-click="chsrot();">利 率</th>
+                                            <th width="15%" class="text-right">利润</th>
+                                            <th width="15%" class="text-right">时间</th>
+                                            <th width="15%" class="text-right">操作</th>
                                         </table>
-                                        <div data-slim-scroll data-scroll-height="{{height*0.5 - 90}}">
+                                        <div data-slim-scroll data-scroll-height="242">
                                             <table class="table table-striped">
                                                 <tr ng-repeat="item in sortList | search:settings.Items.filter | orderBy :[sort]">
-                                                    <td width="12%" class="text-center">{{item.symbol}}</td>
-                                                    <td class="text-center">
-                                                        <table width="100%">
-                                                            <tr>
-                                                                <td width="46%" align="right">
-                                                                    {{item.platformA|arrayAttr:platform.Items:'Name'}}
-                                                                </td>
-                                                                <td align="center">-></td>
-                                                                <td width="46%" align="left">
-                                                                    {{item.platformB|arrayAttr:platform.Items:'Name'}}
-                                                                </td>
-                                                            </tr>
-                                                        </table>
-                                                    </td>
-                                                    <td width="14%" class="text-right"
-                                                        ng-class="{'text-red' : item.percent>0, 'text-green':item.percent<0}">
-                                                        {{item.percent | number:2}}%
-                                                    </td>
-                                                    <td width="14%" class="text-right">{{item.money | number:2}}</td>
-                                                    <td width="14%" class="text-center"
-                                                        title="{{item.timestamp  | date:'HH:mm:ss'}}">
-                                                        <span>{{item.msg}}</span></td>
-                                                    <td width="14%" class="text-center"><a
-                                                            ng-click="addOrder(item.symbol, 0);"
-                                                            class="btn btn-default btn-sm">交易</a></td>
+                                                    <td width="10%">{{item.symbol}}</td>
+                                                    <td  class="text-center">{{item.platformA|arrayAttr:platform.Items:'Name'}}->{{item.platformB|arrayAttr:platform.Items:'Name'}}</td>
+                                                    <td width="15%" class="text-right" ng-class="{'text-red' : item.percent>0, 'text-green':item.percent<0}"><strong>{{item.percent | number:2}}%</strong></td>
+                                                    <td width="15%" class="text-right">{{item.money | number:2}}</td>
+                                                    <td width="15%" class="text-right" title="{{item.timestamp  | date:'HH:mm:ss'}}"><span>{{item.msg}}</span></td>
+                                                    <td width="15%" class="text-right"><a ng-click="addOrder(item.symbol, 0);" class="btn btn-default btn-sm">交易</a></td>
                                                 </tr>
                                             </table>
                                         </div>
@@ -113,14 +76,14 @@
 
 
                             <tab heading="基础设置" ng-click="active(1);">
-                                <div class="pad-5" data-slim-scroll data-scroll-height="{{height*0.5 - 85}}">
+                                <div class="pad-5" data-slim-scroll data-scroll-height="250">
 
                                     <div class="panel panel-default mb-5">
                                         <div class="panel-heading">
                                             <h3 class="panel-title">交易</h3>
                                         </div>
-                                        <div class="panel-body" style="background-color: #f9f9f9">
-                                            <form class="form-horizontal mt-10 mr-20" role="form">
+                                        <div class="panel-body" style="background-color: #eef0f0">
+                                            <form class="form-horizontal mt-10" role="form">
 
                                                 <div class="col-md-6">
                                                     <div class="form-group">
@@ -169,7 +132,6 @@
                                                                        ng-model="settings.Items.filter.expired"
                                                                        placeholder="过滤几秒前的数据"
                                                                        ng-required="false">
-                                                                <span class="input-group-addon">秒</span>
 
                                                             </div>
                                                         </div>
@@ -183,11 +145,10 @@
                                         <div class="panel-heading">
                                             <h3 class="panel-title">主站</h3>
                                         </div>
-                                        <div class="panel-body" style="background-color: #f9f9f9">
+                                        <div class="panel-body" style="background-color: #eef0f0">
                                             <div class="col-md-4 pad-5" ng-repeat="item in platform.Items">
                                                 <label class="ui-checkbox">
-                                                    <input name="checkbox1" type="checkbox"
-                                                           ng-model="settings.Items.filter.platformA[item.Id]"><span>{{item.Name}}</span>
+                                                    <input name="checkbox1" type="checkbox"  ng-model="settings.Items.filter.platformA[item.Id]"><span>{{item.Name}}</span>
                                                 </label>
                                             </div>
                                         </div>
@@ -197,11 +158,10 @@
                                         <div class="panel-heading">
                                             <h3 class="panel-title">次站</h3>
                                         </div>
-                                        <div class="panel-body" style="background-color: #f9f9f9">
+                                        <div class="panel-body" style="background-color: #eef0f0">
                                             <div class="col-md-4 pad-5" ng-repeat="item in platform.Items">
                                                 <label class="ui-checkbox">
-                                                    <input name="checkbox1" type="checkbox"
-                                                           ng-model="settings.Items.filter.platformB[item.Id]"><span>{{item.Name}}</span>
+                                                    <input name="checkbox1" type="checkbox"  ng-model="settings.Items.filter.platformB[item.Id]"><span>{{item.Name}}</span>
                                                 </label>
                                             </div>
                                         </div>
@@ -211,11 +171,10 @@
                                         <div class="panel-heading">
                                             <h3 class="panel-title">币种</h3>
                                         </div>
-                                        <div class="panel-body" style="background-color: #f9f9f9">
+                                        <div class="panel-body" style="background-color: #eef0f0">
                                             <div class="col-md-4 pad-5" ng-repeat="item in symbol.Items">
                                                 <label class="ui-checkbox">
-                                                    <input name="checkbox1" type="checkbox"
-                                                           ng-model="settings.Items.filter.symbol[item.Symbol]"><span>{{item.Symbol}}</span>
+                                                    <input name="checkbox1" type="checkbox"  ng-model="settings.Items.filter.symbol[item.Symbol]"><span>{{item.Symbol}}</span>
                                                 </label>
                                             </div>
                                         </div>
@@ -226,7 +185,7 @@
 
                             </tab>
                             <tab heading="扩展设置" ng-click="active(2);">
-                                <form class="form-horizontal mt-10 mr-20" role="form">
+                                <form class="form-horizontal mt-10" role="form">
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="col-sm-4 control-label">平台</label>
@@ -264,28 +223,27 @@
                                         <th width="25%" class="text-center">转账费</th>
                                         <th width="25%" class="text-center">数量</th>
                                     </table>
-                                    <div data-slim-scroll data-scroll-height="{{height*0.5 - 184}}">
+                                    <div data-slim-scroll data-scroll-height="148">
                                         <form class="form-horizontal" role="form">
                                             <table class="table table-striped">
-                                                <tr ng-repeat="item in symbol.Items | orderBy:['Sort']">
-                                                    <td width="25%"> {{item.Symbol}}</td>
+                                                <tr ng-repeat="(key, item) in settings.Items.symbol[settings.Items.platform]">
+                                                    <td width="25%"> {{key}}</td>
                                                     <td width="25%">
                                                         <div class="input-group">
                                                             <input type="number" class="form-control"
-                                                                   ng-model="settings.Items.symbol[settings.Items.platform][item.Symbol].fee"
+                                                                   ng-model="item.fee"
                                                                    placeholder="交易费"
                                                                    ng-required="true">
                                                         </div>
                                                     </td>
                                                     <td width="25%">
                                                         <input type="number" class="form-control"
-                                                               ng-model="settings.Items.symbol[settings.Items.platform][item.Symbol].transfer"
+                                                               ng-model="item.transfer"
                                                                placeholder="转账费"
                                                                ng-required="true">
                                                     </td>
                                                     <td width="25%">
-                                                        <input type="number" class="form-control"
-                                                               ng-model="settings.Items.symbol[settings.Items.platform][item.Symbol].amount"
+                                                        <input type="number" class="form-control" ng-model="item.amount"
                                                                placeholder="交易数量"
                                                                ng-required="true">
                                                     </td>
@@ -309,7 +267,7 @@
                                             <th width="10%">操作</th>
                                         </table>
 
-                                        <div data-slim-scroll data-scroll-height="{{height*0.5 - 136}}">
+                                        <div data-slim-scroll data-scroll-height="196">
 
                                             <table class="table table-striped">
                                                 <tr ng-if="balance.Items.HuobiTrade['Money']>0 || balance.Items.HuobiFrozen['Money']>0 || balance.Items.BithumbTrade['Money']>0 || balance.Items.BithumbFrozen['Money']>0">
@@ -328,13 +286,13 @@
                                                                        class="btn btn-default btn-sm">平衡</a></td>
                                                 </tr>
                                                 <!-- <tr ng-if="balance.Items.HuobiTrade[key]>0 || balance.Items.HuobiFrozen[key]>0 || balance.Items.BithumbTrade[key]>0 || balance.Items.BithumbFrozen[key]>0" ng-repeat="(key, item) in settings.Items.symbol">-->
-                                                <tr ng-repeat="item in symbol.Items | orderBy:['Sort']">
-                                                    <td width="30%"> {{item.Symbol}}</td>
+                                                <tr ng-repeat="(key, item) in settings.Items.symbol">
+                                                    <td width="30%"> {{key}}</td>
                                                     <td width="30%">
-                                                        {{balance.Items.HuobiTrade[item.Symbol]}}/{{balance.Items.HuobiFrozen[item.Symbol]}}
+                                                        {{balance.Items.HuobiTrade[key]}}/{{balance.Items.HuobiFrozen[key]}}
                                                     </td>
                                                     <td width="30%">
-                                                        {{balance.Items.BithumbTrade[item.Symbol]}}/{{balance.Items.BithumbFrozen[item.Symbol]}}
+                                                        {{balance.Items.BithumbTrade[key]}}/{{balance.Items.BithumbFrozen[key]}}
                                                     </td>
                                                     <td width="10%"><a ng-click="save();"
                                                                        class="btn btn-default btn-sm">平衡</a></td>
@@ -373,7 +331,7 @@
                             <th width="15%">数量</th>
                             <th>状态</th>
                         </table>
-                        <div data-slim-scroll data-scroll-height="{{height*0.1}}">
+                        <div data-slim-scroll data-scroll-height="100">
                             <table class="table table-striped">
                                 <tr ng-repeat="(key, item) in order.Items">
                                     <td width="10%">{{item.Mode|arrayAttr:select.mode:'Name'}}</td>
@@ -393,7 +351,7 @@
                 </div>
 
 
-                <div class="panel panel-default mb-0">
+                <div class="panel panel-default mb-5">
                     <div class="panel-heading pad-10">
                         <div class="btn-group pull-right">
                             <a ng-click="message=[];" class="btn btn-default btn-sm">清空</a>
@@ -409,7 +367,7 @@
                             <th width="20%">盈利额</th>
                             <th width="10%">操作</th>
                         </table>
-                        <div data-slim-scroll data-scroll-height="{{height * 0.3 -123}}">
+                        <div data-slim-scroll data-scroll-height="{{height-653}}">
 
                             <table class="table table-striped">
 
@@ -430,7 +388,7 @@
                 </div>
 
 
-           
+            </div>
 
         </div>
 

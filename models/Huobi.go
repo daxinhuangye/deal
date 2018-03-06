@@ -120,8 +120,6 @@ func (this *Huobi) GetBalance() (map[string]float64, map[string]float64) {
 
 	content := this.request(api)
 
-	beego.Trace(content)
-
 	list := gjson.Get(content, "data.list").Array()
 
 	trade := make(map[string]float64)
@@ -322,6 +320,7 @@ func (this *Huobi) request(api string, fields ...interface{}) string {
 	status := gjson.Get(content, "status").String()
 	if status != "ok" {
 		err_msg := gjson.Get(content, "err-msg").String()
+		beego.Trace(api)
 		beego.Error(err_msg)
 		return ""
 	}

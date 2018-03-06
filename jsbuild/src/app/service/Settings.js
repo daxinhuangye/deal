@@ -14,7 +14,67 @@ app.service('SettingsService', ["$rootScope", "$http", "$filter", "appCfg", "EzC
 
         $http.get(url).success(function(data, status, headers, config) {
                 if($filter("CheckError")(data)){
-                    self.data.Items = angular.fromJson(data.Data);
+                    var temp = angular.fromJson(data.Data);
+                    for(var i=1; i<=9;i++){
+                        if (angular.isUndefined(temp.rate[i])){
+                            temp.rate[i] = 1;
+                        }
+                        if (angular.isUndefined(temp.symbol[i])){
+                            temp.symbol[i] = {
+                                "BTC": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "ETH": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "DASH": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "LTC": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "ETC": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "XRP": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "BCH": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "ZEC": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "QTUM": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                },
+                                "EOS": {
+                                    "fee": 0.2,
+                                    "transfer": 0.001,
+                                    "amount": 0.3
+                                }
+                            };
+                        }
+                    }
+                    self.data.Items = temp;
                 }
             }) .error(function(data, status, headers, config) {
 

@@ -1,4 +1,4 @@
-app.service('WebsocketService', ['$rootScope', function($rootScope) {
+app.service("WebsocketService", ["$rootScope", "$filter", function($rootScope, $filter) {
 
 	var Service = {};
     var ws = null;
@@ -22,7 +22,7 @@ app.service('WebsocketService', ['$rootScope', function($rootScope) {
 	    };
 	    
 	    ws.onclose = function () {
-			console.log("连接关闭");
+			$filter("AlertError")("与服务器断开连接，尝试刷新页面重新连接");
 			conn = false;
 		};
 		

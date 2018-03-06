@@ -3,6 +3,7 @@ package routers
 import (
 	"Deal/controllers"
 	"Deal/controllers/admin"
+
 	"github.com/astaxie/beego"
 )
 
@@ -15,6 +16,7 @@ func init() {
 	beego.AutoRouter(&controllers.OrderController{})
 	beego.AutoRouter(&controllers.ApiController{})
 	beego.AutoRouter(&controllers.ApppubController{})
+	beego.AutoRouter(&controllers.TradingController{})
 
 	/*********************系统路由********************************/
 

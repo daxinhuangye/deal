@@ -1,5 +1,5 @@
-app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService", "SymbolService", "$timeout", "WebsocketService","BalanceService", "SettingsService","OrderService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService, SymbolService, $timeout, WebsocketService, BalanceService, SettingsService, OrderService) {
-    $scope.height = $scope.windowHeight - 90;
+app.controller("QuantiCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService", "SymbolService", "$timeout", "WebsocketService","BalanceService", "SettingsService","OrderService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService, SymbolService, $timeout, WebsocketService, BalanceService, SettingsService, OrderService) {
+    $scope.height = $scope.windowHeight - 100;
 
 	//平台数据
 	$scope.platform = PlatformService.data;
