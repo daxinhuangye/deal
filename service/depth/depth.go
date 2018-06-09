@@ -17,12 +17,16 @@ type Subdepth struct {
 	Currency string
 }
 
+const (
+	GOROUTINE_COUNT = 10
+)
+
 var symbolData []orm.Params
 
 var (
 	symbolManage = make(map[string]string)
 
-	depthChan = make(chan Subdepth)
+	depthChan = make(chan Subdepth, 10)
 
 	msgTemplate = `{"symbol":"%s", "platform":%d, "bids":%f, "asks":%f, "time":%d}`
 )
@@ -30,20 +34,20 @@ var (
 //开启实时行情
 func DepthRun() {
 	beego.Trace("行情开启")
-	time.Sleep(1000 * time.Millisecond)
+	time.Sleep(1 * time.Second)
 	//
 	go listionDepthChan()
 
 	for _, v := range symbolData {
-		pushDepthChan(2, v["Symbol"].(string), v["Bithumb"].(string))
+		go pushDepthChan(2, v["Symbol"].(string), v["Bithumb"].(string))
 
-		pushDepthChan(4, v["Symbol"].(string), v["Coinone"].(string))
+		go pushDepthChan(4, v["Symbol"].(string), v["Coinone"].(string))
 
-		pushDepthChan(5, v["Symbol"].(string), v["Korbit"].(string))
+		go pushDepthChan(5, v["Symbol"].(string), v["Korbit"].(string))
 
-		pushDepthChan(6, v["Symbol"].(string), v["Coinnest"].(string))
+		go pushDepthChan(6, v["Symbol"].(string), v["Coinnest"].(string))
 
-		pushDepthChan(7, v["Symbol"].(string), v["Gate"].(string))
+		go pushDepthChan(7, v["Symbol"].(string), v["Gate"].(string))
 		/*
 			pushDepthChan(8, v["Symbol"].(string), v["Okex"].(string))
 
@@ -116,16 +120,13 @@ func getDepthData(platform int, symbol, currency string) {
 }
 func listionDepthChan() {
 
-	for {
-
-		select {
-
-		case sub := <-depthChan:
-			go getDepthData(sub.Platform, sub.Symbol, sub.Currency)
-
-		default:
-
-		}
+	for i := 1; i <= GOROUTINE_COUNT; i++ {
+		go func(i int) {
+			for {
+				sub := <-depthChan
+				getDepthData(sub.Platform, sub.Symbol, sub.Currency)
+			}
+		}(i)
 	}
 
 }

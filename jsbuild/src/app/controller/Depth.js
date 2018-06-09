@@ -1,5 +1,7 @@
 app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm", "appCfg", "PlatformService", "SymbolService", "$timeout", "WebsocketService","BalanceService", "SettingsService","OrderService",  function ($scope, $http, $filter, $modal, EzConfirm, appCfg, PlatformService, SymbolService, $timeout, WebsocketService, BalanceService, SettingsService, OrderService) {
-    $scope.height = $scope.windowHeight - 90;
+    $('<audio id="Audio1"><source src="/static/sound/warning.wav" type="audio/wav"></audio>').appendTo('body');
+	
+	$scope.height = $scope.windowHeight - 90;
 
 	//平台数据
 	$scope.platform = PlatformService.data;
@@ -279,12 +281,13 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
         $scope.audio.pause();
         $scope.playing = false;
     };
-
+	/*
    $scope.audio.addEventListener('ended', function() {
         $scope.$apply(function() {
             $scope.stop()
         });
     });
+	*/
 /////////////////////////////
 
 	$scope.message = [];
@@ -372,7 +375,8 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 			
 			if (A_percent>=$scope.settings.Items.surplus || B_percent>=$scope.settings.Items.surplus) {
 
-				$scope.play();
+				//$scope.play();
+				$('#Audio1')[0].play();
 			}
 
 			var push_data1 = {

@@ -47,7 +47,7 @@ func (this *Trading) List(page int64, page_size int64) (data []orm.Params, pagin
 
 	op = op.Limit(page_size, pagination.GetOffset())
 
-	op = op.OrderBy("TickId")
+	op = op.OrderBy("-TickId")
 
 	_, err = op.Values(&data)
 

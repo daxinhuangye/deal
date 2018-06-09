@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	huobi_wss       = "wss://api.huobi.pro/ws"
+	//huobi_wss       = "wss://api.huobi.pro/ws"
+	huobi_wss       = "wss://api.huobipro.com/ws"
 	huobi_client_id = "ATM"
 )
 
