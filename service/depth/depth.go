@@ -48,6 +48,9 @@ func DepthRun() {
 		go pushDepthChan(6, v["Symbol"].(string), v["Coinnest"].(string))
 
 		go pushDepthChan(7, v["Symbol"].(string), v["Gate"].(string))
+
+		//go pushDepthChan(10, v["Symbol"].(string), v["Bitforex"].(string))
+
 		/*
 			pushDepthChan(8, v["Symbol"].(string), v["Okex"].(string))
 
@@ -103,6 +106,10 @@ func getDepthData(platform int, symbol, currency string) {
 		bids, asks, ts = obj.Depth(currency, 0)
 		//beego.Trace("触发:Gate", symbol)
 
+	case 10:
+		obj := models.Bitforex{}
+		bids, asks, ts = obj.Depth(currency, 0)
+		//beego.Trace("触发:Gate", symbol)
 	default:
 		return
 	}

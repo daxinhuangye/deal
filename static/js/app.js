@@ -193,7 +193,7 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		},
 		"9":{
-			"platform":4,
+			"platform":9,
 			"color":false,
 			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
@@ -206,6 +206,21 @@ app.controller("DepthCtrl", ["$scope", "$http", "$filter", "$modal", "EzConfirm"
 			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
 		},
+		"10":{
+			"platform":10,
+			"color":false,
+			"BTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"DASH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"LTC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ETC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"XRP": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"BCH": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"ZEC": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"QTUM": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+			"EOS": {"bids":0, "asks":0,"_bids":0, "_asks":0, "time":0},
+		},
+
 	};
 
 	//下拉配置
