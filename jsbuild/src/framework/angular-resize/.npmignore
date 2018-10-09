@@ -1,8 +1,0 @@
-/Gruntfile.js
-/.travis.yml
-/test
-/src
-/node_modules
-/bower_components
-/libpeerconnection.log
-/*-results.xml
